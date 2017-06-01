@@ -32,7 +32,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.kikikeji.weizhuo.accessibility.DragViewStateAnnouncer;
@@ -292,7 +291,7 @@ public class DragController {
         if (dragRegion != null) {
             dragView.setDragRegion(new Rect(dragRegion));
         }
-
+        Log.d("GLL", "mMotionDownX:" + mMotionDownX + "****mMotionDownY:" + mMotionDownY);
         mLauncher.getDragLayer().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         dragView.show(mMotionDownX, mMotionDownY);
         handleMoveEvent(mMotionDownX, mMotionDownY);
@@ -542,7 +541,7 @@ public class DragController {
 
     private void handleMoveEvent(int x, int y) {
         mDragObject.dragView.move(x, y);
-
+        Log.d("GLL", "x:" + x + "****y:" + y);
         // Drop on someone?
         final int[] coordinates = mCoordinatesTemp;
         DropTarget dropTarget = findDropTarget(x, y, coordinates);
@@ -644,9 +643,11 @@ public class DragController {
                 handleMoveEvent(dragLayerX, dragLayerY);
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log.d("GLL","ACTION_MOVE");
                 handleMoveEvent(dragLayerX, dragLayerY);
                 break;
             case MotionEvent.ACTION_UP:
+                Log.d("GLL","ACTION_UP");
                 // Ensure that we've processed a move event at the current pointer location.
                 handleMoveEvent(dragLayerX, dragLayerY);
                 mHandler.removeCallbacks(mScrollRunnable);

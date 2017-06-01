@@ -198,5 +198,5 @@
     <dimen name="app_widget_preview_label_vertical_padding">12dp</dimen>
     <dimen name="app_widget_preview_label_horizontal_padding">8dp</dimen>
     <!--add lallapp code by zhaopenglin 20170313 end-->
-
+    <dimen name="folder_name_padding">10dp</dimen>
 </resources>

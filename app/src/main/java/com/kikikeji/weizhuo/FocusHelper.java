@@ -1,612 +1,880 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2011 The Android Open Source Project
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.kikikeji.weizhuo;
 
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import android.content.res.Configuration;
 import android.view.KeyEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.kikikeji.weizhuo.util.FocusLogic;
-import com.kikikeji.weizhuo.util.Thunk;
+import android.view.ViewParent;
+import android.widget.ScrollView;
 
 /**
  * A keyboard listener we set on all the workspace icons.
  */
 class IconKeyEventListener implements View.OnKeyListener {
-    @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         return FocusHelper.handleIconKeyEvent(v, keyCode, event);
     }
 }
 
+
+/**
+ * A keyboard listener we set on all the workspace icons.
+ */
+class FolderKeyEventListener implements View.OnKeyListener {
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        return FocusHelper.handleFolderKeyEvent(v, keyCode, event);
+    }
+}
+
+
 /**
  * A keyboard listener we set on all the hotseat buttons.
  */
 class HotseatIconKeyEventListener implements View.OnKeyListener {
-    @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-        return FocusHelper.handleHotseatButtonKeyEvent(v, keyCode, event);
+        final Configuration configuration = v.getResources().getConfiguration();
+        return FocusHelper.handleHotseatButtonKeyEvent(v, keyCode, event, configuration.orientation);
     }
 }
 
-/**
- * A keyboard listener we set on full screen pages (e.g. custom content).
- */
-class FullscreenKeyEventListener implements View.OnKeyListener {
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT
-                || keyCode == KeyEvent.KEYCODE_PAGE_DOWN || keyCode == KeyEvent.KEYCODE_PAGE_UP) {
-            // Handle the key event just like a workspace icon would in these cases. In this case,
-            // it will basically act as if there is a single icon in the top left (so you could
-            // think of the fullscreen page as a focusable fullscreen widget).
-            return FocusHelper.handleIconKeyEvent(v, keyCode, event);
-        }
-        return false;
-    }
-}
 
 public class FocusHelper {
-
-    private static final String TAG = "FocusHelper";
-    private static final boolean DEBUG = false;
+    /**
+     * Private helper to get the parent TabHost in the view hiearchy.
+     */
+    private static AppsCustomizeTabHost findTabHostParent(View v) {
+        ViewParent p = v.getParent();
+        while (p != null && !(p instanceof AppsCustomizeTabHost)) {
+            p = p.getParent();
+        }
+        return (AppsCustomizeTabHost) p;
+    }
 
     /**
-     * Handles key events in paged folder.
+     * Returns the Viewgroup containing page contents for the page at the index specified.
      */
-    public static class PagedFolderKeyEventListener implements View.OnKeyListener {
-
-        private final Folder mFolder;
-
-        public PagedFolderKeyEventListener(Folder folder) {
-            mFolder = folder;
+    private static ViewGroup getAppsCustomizePage(ViewGroup container, int index) {
+        ViewGroup page = (ViewGroup) ((PagedView) container).getPageAt(index);
+        if (page instanceof CellLayout) {
+            // There are two layers, a PagedViewCellLayout and PagedViewCellLayoutChildren
+            page = ((CellLayout) page).getShortcutsAndWidgets();
         }
+        return page;
+    }
 
-        @Override
-        public boolean onKey(View v, int keyCode, KeyEvent e) {
-            boolean consume = FocusLogic.shouldConsume(keyCode);
-            if (e.getAction() == KeyEvent.ACTION_UP) {
-                return consume;
-            }
-            if (DEBUG) {
-                Log.v(TAG, String.format("Handle ALL Folders keyevent=[%s].",
-                        KeyEvent.keyCodeToString(keyCode)));
-            }
+    /**
+     * Handles key events in a PageViewExtendedLayout containing PagedViewWidgets.
+     */
+    static boolean handlePagedViewGridLayoutWidgetKeyEvent(PagedViewWidget w, int keyCode, KeyEvent e) {
 
-            if (!(v.getParent() instanceof ShortcutAndWidgetContainer)) {
-                if (LauncherAppState.isDogfoodBuild()) {
-                    throw new IllegalStateException("Parent of the focused item is not supported.");
-                } else {
-                    return false;
+        final PagedViewGridLayout parent = (PagedViewGridLayout) w.getParent();
+        final PagedView container = (PagedView) parent.getParent();
+        final int widgetIndex = parent.indexOfChild(w);
+        final int widgetCount = parent.getChildCount();
+        final int pageIndex = ((PagedView) container).indexToPage(container.indexOfChild(parent));
+        final int pageCount = container.getChildCount();
+        final int cellCountX = parent.getCellCountX();
+        final int cellCountY = parent.getCellCountY();
+        final int x = widgetIndex % cellCountX;
+        final int y = widgetIndex / cellCountX;
+
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        ViewGroup newParent = null;
+        // Now that we load items in the bg asynchronously, we can't just focus
+        // child siblings willy-nilly
+        View child = null;
+        boolean wasHandled = false;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (handleKeyEvent) {
+                    // Select the previous widget or the last widget on the previous page
+                    if (widgetIndex > 0) {
+                        parent.getChildAt(widgetIndex - 1).requestFocus();
+                    } else {
+                        if (pageIndex > 0) {
+                            newParent = getAppsCustomizePage(container, pageIndex - 1);
+                            if (newParent != null) {
+                                child = newParent.getChildAt(newParent.getChildCount() - 1);
+                                if (child != null) child.requestFocus();
+                            }
+                        }
+                    }
                 }
-            }
-
-            // Initialize variables.
-            final ShortcutAndWidgetContainer itemContainer = (ShortcutAndWidgetContainer) v.getParent();
-            final CellLayout cellLayout = (CellLayout) itemContainer.getParent();
-
-            final int iconIndex = itemContainer.indexOfChild(v);
-            final FolderPagedView pagedView = (FolderPagedView) cellLayout.getParent();
-
-            final int pageIndex = pagedView.indexOfChild(cellLayout);
-            final int pageCount = pagedView.getPageCount();
-            final boolean isLayoutRtl = Utilities.isRtl(v.getResources());
-
-            int[][] matrix = FocusLogic.createSparseMatrix(cellLayout);
-            // Process focus.
-            int newIconIndex = FocusLogic.handleKeyEvent(keyCode, matrix, iconIndex, pageIndex,
-                    pageCount, isLayoutRtl);
-            if (newIconIndex == FocusLogic.NOOP) {
-                handleNoopKey(keyCode, v);
-                return consume;
-            }
-            ShortcutAndWidgetContainer newParent = null;
-            View child = null;
-
-            switch (newIconIndex) {
-                case FocusLogic.PREVIOUS_PAGE_RIGHT_COLUMN:
-                case FocusLogic.PREVIOUS_PAGE_LEFT_COLUMN:
-                    newParent = getCellLayoutChildrenForIndex(pagedView, pageIndex - 1);
-                    if (newParent != null) {
-                        int row = ((CellLayout.LayoutParams) v.getLayoutParams()).cellY;
-                        pagedView.snapToPage(pageIndex - 1);
-                        child = newParent.getChildAt(
-                                ((newIconIndex == FocusLogic.PREVIOUS_PAGE_LEFT_COLUMN)
-                                    ^ newParent.invertLayoutHorizontally()) ? 0 : matrix.length - 1,
-                                row);
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (handleKeyEvent) {
+                    // Select the next widget or the first widget on the next page
+                    if (widgetIndex < (widgetCount - 1)) {
+                        parent.getChildAt(widgetIndex + 1).requestFocus();
+                    } else {
+                        if (pageIndex < (pageCount - 1)) {
+                            newParent = getAppsCustomizePage(container, pageIndex + 1);
+                            if (newParent != null) {
+                                child = newParent.getChildAt(0);
+                                if (child != null) child.requestFocus();
+                            }
+                        }
                     }
-                    break;
-                case FocusLogic.PREVIOUS_PAGE_FIRST_ITEM:
-                    newParent = getCellLayoutChildrenForIndex(pagedView, pageIndex - 1);
-                    if (newParent != null) {
-                        pagedView.snapToPage(pageIndex - 1);
-                        child = newParent.getChildAt(0, 0);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the previous row, otherwise select the tab bar
+                    if (y > 0) {
+                        int newWidgetIndex = ((y - 1) * cellCountX) + x;
+                        child = parent.getChildAt(newWidgetIndex);
+                        if (child != null) child.requestFocus();
                     }
-                    break;
-                case FocusLogic.PREVIOUS_PAGE_LAST_ITEM:
-                    newParent = getCellLayoutChildrenForIndex(pagedView, pageIndex - 1);
-                    if (newParent != null) {
-                        pagedView.snapToPage(pageIndex - 1);
-                        child = newParent.getChildAt(matrix.length - 1, matrix[0].length - 1);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the previous row, otherwise do nothing
+                    if (y < (cellCountY - 1)) {
+                        int newWidgetIndex = Math.min(widgetCount - 1, ((y + 1) * cellCountX) + x);
+                        child = parent.getChildAt(newWidgetIndex);
+                        if (child != null) child.requestFocus();
                     }
-                    break;
-                case FocusLogic.NEXT_PAGE_FIRST_ITEM:
-                    newParent = getCellLayoutChildrenForIndex(pagedView, pageIndex + 1);
-                    if (newParent != null) {
-                        pagedView.snapToPage(pageIndex + 1);
-                        child = newParent.getChildAt(0, 0);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if (handleKeyEvent) {
+                    // Simulate a click on the widget
+                    View.OnClickListener clickListener = (View.OnClickListener) container;
+                    clickListener.onClick(w);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_PAGE_UP:
+                if (handleKeyEvent) {
+                    // Select the first item on the previous page, or the first item on this page
+                    // if there is no previous page
+                    if (pageIndex > 0) {
+                        newParent = getAppsCustomizePage(container, pageIndex - 1);
+                        if (newParent != null) {
+                            child = newParent.getChildAt(0);
+                        }
+                    } else {
+                        child = parent.getChildAt(0);
                     }
-                    break;
-                case FocusLogic.NEXT_PAGE_LEFT_COLUMN:
-                case FocusLogic.NEXT_PAGE_RIGHT_COLUMN:
-                    newParent = getCellLayoutChildrenForIndex(pagedView, pageIndex + 1);
-                    if (newParent != null) {
-                        pagedView.snapToPage(pageIndex + 1);
-                        child = FocusLogic.getAdjacentChildInNextFolderPage(
-                                newParent, v, newIconIndex);
+                    if (child != null) child.requestFocus();
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_PAGE_DOWN:
+                if (handleKeyEvent) {
+                    // Select the first item on the next page, or the last item on this page
+                    // if there is no next page
+                    if (pageIndex < (pageCount - 1)) {
+                        newParent = getAppsCustomizePage(container, pageIndex + 1);
+                        if (newParent != null) {
+                            child = newParent.getChildAt(0);
+                        }
+                    } else {
+                        child = parent.getChildAt(widgetCount - 1);
                     }
-                    break;
-                case FocusLogic.CURRENT_PAGE_FIRST_ITEM:
-                    child = cellLayout.getChildAt(0, 0);
-                    break;
-                case FocusLogic.CURRENT_PAGE_LAST_ITEM:
-                    child = pagedView.getLastItem();
-                    break;
-                default: // Go to some item on the current page.
-                    child = itemContainer.getChildAt(newIconIndex);
-                    break;
-            }
-            if (child != null) {
-                child.requestFocus();
-                playSoundEffect(keyCode, v);
-            } else {
-                handleNoopKey(keyCode, v);
-            }
-            return consume;
+                    if (child != null) child.requestFocus();
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_HOME:
+                if (handleKeyEvent) {
+                    // Select the first item on this page
+                    child = parent.getChildAt(0);
+                    if (child != null) child.requestFocus();
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_END:
+                if (handleKeyEvent) {
+                    // Select the last item on this page
+                    parent.getChildAt(widgetCount - 1).requestFocus();
+                }
+                wasHandled = true;
+                break;
+            default:
+                break;
+        }
+        return wasHandled;
+    }
+
+    /**
+     * Handles key events in a PageViewCellLayout containing PagedViewIcons.
+     */
+    static boolean handleAppsCustomizeKeyEvent(View v, int keyCode, KeyEvent e) {
+        ViewGroup parentLayout;
+        ViewGroup itemContainer;
+        int countX;
+        int countY;
+        if (v.getParent() instanceof ShortcutAndWidgetContainer) {
+            itemContainer = (ViewGroup) v.getParent();
+            parentLayout = (ViewGroup) itemContainer.getParent();
+            countX = ((CellLayout) parentLayout).getCountX();
+            countY = ((CellLayout) parentLayout).getCountY();
+        } else {
+            itemContainer = parentLayout = (ViewGroup) v.getParent();
+            countX = ((PagedViewGridLayout) parentLayout).getCellCountX();
+            countY = ((PagedViewGridLayout) parentLayout).getCellCountY();
         }
 
-        public void handleNoopKey(int keyCode, View v) {
-            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                mFolder.mFolderName.requestFocus();
-                playSoundEffect(keyCode, v);
-            }
+        // Note we have an extra parent because of the
+        // PagedViewCellLayout/PagedViewCellLayoutChildren relationship
+        final PagedView container = (PagedView) parentLayout.getParent();
+        final int iconIndex = itemContainer.indexOfChild(v);
+        final int itemCount = itemContainer.getChildCount();
+        final int pageIndex = ((PagedView) container).indexToPage(container.indexOfChild(parentLayout));
+        final int pageCount = container.getChildCount();
+
+        final int x = iconIndex % countX;
+        final int y = iconIndex / countX;
+
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        ViewGroup newParent = null;
+        // Side pages do not always load synchronously, so check before focusing child siblings
+        // willy-nilly
+        View child = null;
+        boolean wasHandled = false;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (handleKeyEvent) {
+                    // Select the previous icon or the last icon on the previous page
+                    if (iconIndex > 0) {
+                        itemContainer.getChildAt(iconIndex - 1).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                    } else {
+                        if (pageIndex > 0) {
+                            newParent = getAppsCustomizePage(container, pageIndex - 1);
+                            if (newParent != null) {
+                                container.snapToPage(pageIndex - 1);
+                                child = newParent.getChildAt(newParent.getChildCount() - 1);
+                                if (child != null) {
+                                    child.requestFocus();
+                                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                                }
+                            }
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (handleKeyEvent) {
+                    // Select the next icon or the first icon on the next page
+                    if (iconIndex < (itemCount - 1)) {
+                        itemContainer.getChildAt(iconIndex + 1).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
+                    } else {
+                        if (pageIndex < (pageCount - 1)) {
+                            newParent = getAppsCustomizePage(container, pageIndex + 1);
+                            if (newParent != null) {
+                                container.snapToPage(pageIndex + 1);
+                                child = newParent.getChildAt(0);
+                                if (child != null) {
+                                    child.requestFocus();
+                                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
+                                }
+                            }
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the previous row, otherwise select the tab bar
+                    if (y > 0) {
+                        int newiconIndex = ((y - 1) * countX) + x;
+                        itemContainer.getChildAt(newiconIndex).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the next row, otherwise do nothing
+                    if (y < (countY - 1)) {
+                        int newiconIndex = Math.min(itemCount - 1, ((y + 1) * countX) + x);
+                        int newIconY = newiconIndex / countX;
+                        if (newIconY != y) {
+                            itemContainer.getChildAt(newiconIndex).requestFocus();
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_PAGE_UP:
+                if (handleKeyEvent) {
+                    // Select the first icon on the previous page, or the first icon on this page
+                    // if there is no previous page
+                    if (pageIndex > 0) {
+                        newParent = getAppsCustomizePage(container, pageIndex - 1);
+                        if (newParent != null) {
+                            container.snapToPage(pageIndex - 1);
+                            child = newParent.getChildAt(0);
+                            if (child != null) {
+                                child.requestFocus();
+                                v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                            }
+                        }
+                    } else {
+                        itemContainer.getChildAt(0).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_PAGE_DOWN:
+                if (handleKeyEvent) {
+                    // Select the first icon on the next page, or the last icon on this page
+                    // if there is no next page
+                    if (pageIndex < (pageCount - 1)) {
+                        newParent = getAppsCustomizePage(container, pageIndex + 1);
+                        if (newParent != null) {
+                            container.snapToPage(pageIndex + 1);
+                            child = newParent.getChildAt(0);
+                            if (child != null) {
+                                child.requestFocus();
+                                v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                            }
+                        }
+                    } else {
+                        itemContainer.getChildAt(itemCount - 1).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_HOME:
+                if (handleKeyEvent) {
+                    // Select the first icon on this page
+                    itemContainer.getChildAt(0).requestFocus();
+                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_END:
+                if (handleKeyEvent) {
+                    // Select the last icon on this page
+                    itemContainer.getChildAt(itemCount - 1).requestFocus();
+                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                }
+                wasHandled = true;
+                break;
+            default:
+                break;
         }
+        return wasHandled;
+    }
+
+    /**
+     * Handles key events in the tab widget.
+     */
+    static boolean handleTabKeyEvent(AccessibleTabView v, int keyCode, KeyEvent e) {
+        if (!LauncherAppState.getInstance().isScreenLarge()) return false;
+
+        final FocusOnlyTabWidget parent = (FocusOnlyTabWidget) v.getParent();
+        final AppsCustomizeTabHost tabHost = findTabHostParent(parent);
+        final ViewGroup contents = tabHost.getContent();
+        final int tabCount = parent.getTabCount();
+        final int tabIndex = parent.getChildTabIndex(v);
+
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        boolean wasHandled = false;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (handleKeyEvent) {
+                    // Select the previous tab
+                    if (tabIndex > 0) {
+                        parent.getChildTabViewAt(tabIndex - 1).requestFocus();
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (handleKeyEvent) {
+                    // Select the next tab, or if the last tab has a focus right id, select that
+                    if (tabIndex < (tabCount - 1)) {
+                        parent.getChildTabViewAt(tabIndex + 1).requestFocus();
+                    } else {
+                        if (v.getNextFocusRightId() != View.NO_ID) {
+                            tabHost.findViewById(v.getNextFocusRightId()).requestFocus();
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                // Do nothing
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (handleKeyEvent) {
+                    // Select the content view
+                    contents.requestFocus();
+                }
+                wasHandled = true;
+                break;
+            default:
+                break;
+        }
+        return wasHandled;
     }
 
     /**
      * Handles key events in the workspace hotseat (bottom of the screen).
-     * <p>Currently we don't special case for the phone UI in different orientations, even though
-     * the hotseat is on the side in landscape mode. This is to ensure that accessibility
-     * consistency is maintained across rotations.
      */
-    static boolean handleHotseatButtonKeyEvent(View v, int keyCode, KeyEvent e) {
-        boolean consume = FocusLogic.shouldConsume(keyCode);
-        if (e.getAction() == KeyEvent.ACTION_UP || !consume) {
-            return consume;
-        }
-
-        final Launcher launcher = (Launcher) v.getContext();
-        final DeviceProfile profile = launcher.getDeviceProfile();
-
-        if (DEBUG) {
-            Log.v(TAG, String.format(
-                    "Handle HOTSEAT BUTTONS keyevent=[%s] on hotseat buttons, isVertical=%s",
-                    KeyEvent.keyCodeToString(keyCode), profile.isVerticalBarLayout()));
-        }
-
-        // Initialize the variables.
-        final Workspace workspace = (Workspace) v.getRootView().findViewById(R.id.workspace);
-        final ShortcutAndWidgetContainer hotseatParent = (ShortcutAndWidgetContainer) v.getParent();
-        final CellLayout hotseatLayout = (CellLayout) hotseatParent.getParent();
-
-        final ItemInfo itemInfo = (ItemInfo) v.getTag();
-        int pageIndex = workspace.getNextPage();
-        int pageCount = workspace.getChildCount();
-        int iconIndex = hotseatParent.indexOfChild(v);
-        int iconRank = ((CellLayout.LayoutParams) hotseatLayout.getShortcutsAndWidgets()
-                .getChildAt(iconIndex).getLayoutParams()).cellX;
-
-        final CellLayout iconLayout = (CellLayout) workspace.getChildAt(pageIndex);
-        if (iconLayout == null) {
-            // This check is to guard against cases where key strokes rushes in when workspace
-            // child creation/deletion is still in flux. (e.g., during drop or fling
-            // animation.)
-            return consume;
-        }
-        final ViewGroup iconParent = iconLayout.getShortcutsAndWidgets();
-
-        ViewGroup parent = null;
-        int[][] matrix = null;
-
-        if (keyCode == KeyEvent.KEYCODE_DPAD_UP &&
-                !profile.isVerticalBarLayout()) {
-            matrix = FocusLogic.createSparseMatrixWithHotseat(iconLayout, hotseatLayout,
-                    true /* hotseat horizontal */, profile.inv.hotseatAllAppsRank);
-            iconIndex += iconParent.getChildCount();
-            parent = iconParent;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT &&
-                profile.isVerticalBarLayout()) {
-            matrix = FocusLogic.createSparseMatrixWithHotseat(iconLayout, hotseatLayout,
-                    false /* hotseat horizontal */, profile.inv.hotseatAllAppsRank);
-            iconIndex += iconParent.getChildCount();
-            parent = iconParent;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT &&
-                profile.isVerticalBarLayout()) {
-            keyCode = KeyEvent.KEYCODE_PAGE_DOWN;
-        } else if (isUninstallKeyChord(e)) {
-            matrix = FocusLogic.createSparseMatrix(iconLayout);
-            if (UninstallDropTarget.supportsDrop(launcher, itemInfo)) {
-                UninstallDropTarget.startUninstallActivity(launcher, itemInfo);
-            }
-        } else if (isDeleteKeyChord(e)) {
-            matrix = FocusLogic.createSparseMatrix(iconLayout);
-            launcher.removeItem(v, itemInfo, true /* deleteFromDb */);
-        } else {
-            // For other KEYCODE_DPAD_LEFT and KEYCODE_DPAD_RIGHT navigation, do not use the
-            // matrix extended with hotseat.
-            matrix = FocusLogic.createSparseMatrix(hotseatLayout);
-            parent = hotseatParent;
-        }
-
-        // Process the focus.
-        int newIconIndex = FocusLogic.handleKeyEvent(keyCode, matrix, iconIndex, pageIndex,
-                pageCount, Utilities.isRtl(v.getResources()));
-
-        View newIcon = null;
-        switch (newIconIndex) {
-            case FocusLogic.NEXT_PAGE_FIRST_ITEM:
-                parent = getCellLayoutChildrenForIndex(workspace, pageIndex + 1);
-                newIcon = parent.getChildAt(0);
-                // TODO(hyunyoungs): handle cases where the child is not an icon but
-                // a folder or a widget.
-                workspace.snapToPage(pageIndex + 1);
-                break;
-            case FocusLogic.PREVIOUS_PAGE_FIRST_ITEM:
-                parent = getCellLayoutChildrenForIndex(workspace, pageIndex - 1);
-                newIcon = parent.getChildAt(0);
-                // TODO(hyunyoungs): handle cases where the child is not an icon but
-                // a folder or a widget.
-                workspace.snapToPage(pageIndex - 1);
-                break;
-            case FocusLogic.PREVIOUS_PAGE_LAST_ITEM:
-                parent = getCellLayoutChildrenForIndex(workspace, pageIndex - 1);
-                newIcon = parent.getChildAt(parent.getChildCount() - 1);
-                // TODO(hyunyoungs): handle cases where the child is not an icon but
-                // a folder or a widget.
-                workspace.snapToPage(pageIndex - 1);
-                break;
-            case FocusLogic.PREVIOUS_PAGE_LEFT_COLUMN:
-            case FocusLogic.PREVIOUS_PAGE_RIGHT_COLUMN:
-                // Go to the previous page but keep the focus on the same hotseat icon.
-                workspace.snapToPage(pageIndex - 1);
-                // If the page we are going to is fullscreen, have it take the focus from hotseat.
-                CellLayout prevPage = (CellLayout) workspace.getPageAt(pageIndex - 1);
-                boolean isPrevPageFullscreen = ((CellLayout.LayoutParams) prevPage
-                        .getShortcutsAndWidgets().getChildAt(0).getLayoutParams()).isFullscreen;
-                if (isPrevPageFullscreen) {
-                    workspace.getPageAt(pageIndex - 1).requestFocus();
-                }
-                break;
-            case FocusLogic.NEXT_PAGE_LEFT_COLUMN:
-            case FocusLogic.NEXT_PAGE_RIGHT_COLUMN:
-                // Go to the next page but keep the focus on the same hotseat icon.
-                workspace.snapToPage(pageIndex + 1);
-                // If the page we are going to is fullscreen, have it take the focus from hotseat.
-                CellLayout nextPage = (CellLayout) workspace.getPageAt(pageIndex + 1);
-                boolean isNextPageFullscreen = ((CellLayout.LayoutParams) nextPage
-                        .getShortcutsAndWidgets().getChildAt(0).getLayoutParams()).isFullscreen;
-                if (isNextPageFullscreen) {
-                    workspace.getPageAt(pageIndex + 1).requestFocus();
-                }
-                break;
-        }
-        if (parent == iconParent && newIconIndex >= iconParent.getChildCount()) {
-            newIconIndex -= iconParent.getChildCount();
-        }
-        if (parent != null) {
-            if (newIcon == null && newIconIndex >= 0) {
-                newIcon = parent.getChildAt(newIconIndex);
-            }
-            if (newIcon != null) {
-                newIcon.requestFocus();
-                playSoundEffect(keyCode, v);
-            }
-        }
-        return consume;
-    }
-
-    /**
-     * Handles key events in a workspace containing icons.
-     */
-    static boolean handleIconKeyEvent(View v, int keyCode, KeyEvent e) {
-        boolean consume = FocusLogic.shouldConsume(keyCode);
-        if (e.getAction() == KeyEvent.ACTION_UP || !consume) {
-            return consume;
-        }
-
-        Launcher launcher = (Launcher) v.getContext();
-        DeviceProfile profile = launcher.getDeviceProfile();
-
-        if (DEBUG) {
-            Log.v(TAG, String.format("Handle WORKSPACE ICONS keyevent=[%s] isVerticalBar=%s",
-                    KeyEvent.keyCodeToString(keyCode), profile.isVerticalBarLayout()));
-        }
-
-        // Initialize the variables.
+    static boolean handleHotseatButtonKeyEvent(View v, int keyCode, KeyEvent e, int orientation) {
         ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
-        CellLayout iconLayout = (CellLayout) parent.getParent();
-        final Workspace workspace = (Workspace) iconLayout.getParent();
-        final ViewGroup dragLayer = (ViewGroup) workspace.getParent();
-        final ViewGroup tabs = (ViewGroup) dragLayer.findViewById(R.id.search_drop_target_bar);
-        final Hotseat hotseat = (Hotseat) dragLayer.findViewById(R.id.hotseat);
+        final CellLayout layout = (CellLayout) parent.getParent();
 
-        final ItemInfo itemInfo = (ItemInfo) v.getTag();
-        final int iconIndex = parent.indexOfChild(v);
-        final int pageIndex = workspace.indexOfChild(iconLayout);
-        final int pageCount = workspace.getChildCount();
-
-        CellLayout hotseatLayout = (CellLayout) hotseat.getChildAt(0);
-        ShortcutAndWidgetContainer hotseatParent = hotseatLayout.getShortcutsAndWidgets();
-        int[][] matrix;
-
-        // KEYCODE_DPAD_DOWN in portrait (KEYCODE_DPAD_RIGHT in landscape) is the only key allowed
-        // to take a user to the hotseat. For other dpad navigation, do not use the matrix extended
-        // with the hotseat.
-        if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && !profile.isVerticalBarLayout()) {
-            matrix = FocusLogic.createSparseMatrixWithHotseat(iconLayout, hotseatLayout,
-                    true /* horizontal */, profile.inv.hotseatAllAppsRank);
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT &&
-                profile.isVerticalBarLayout()) {
-            matrix = FocusLogic.createSparseMatrixWithHotseat(iconLayout, hotseatLayout,
-                    false /* horizontal */, profile.inv.hotseatAllAppsRank);
-        } else if (isUninstallKeyChord(e)) {
-            matrix = FocusLogic.createSparseMatrix(iconLayout);
-            if (UninstallDropTarget.supportsDrop(launcher, itemInfo)) {
-                UninstallDropTarget.startUninstallActivity(launcher, itemInfo);
-            }
-        } else if (isDeleteKeyChord(e)) {
-            matrix = FocusLogic.createSparseMatrix(iconLayout);
-            launcher.removeItem(v, itemInfo, true /* deleteFromDb */);
-        } else {
-            matrix = FocusLogic.createSparseMatrix(iconLayout);
-        }
-
-        // Process the focus.
-        int newIconIndex = FocusLogic.handleKeyEvent(keyCode, matrix, iconIndex, pageIndex,
-                pageCount, Utilities.isRtl(v.getResources()));
-        boolean isRtl = Utilities.isRtl(v.getResources());
-        View newIcon = null;
-        CellLayout workspaceLayout = (CellLayout) workspace.getChildAt(pageIndex);
-        switch (newIconIndex) {
-            case FocusLogic.NOOP:
-                if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-                    newIcon = tabs;
-                }
-                break;
-            case FocusLogic.PREVIOUS_PAGE_RIGHT_COLUMN:
-            case FocusLogic.NEXT_PAGE_RIGHT_COLUMN:
-                int newPageIndex = pageIndex - 1;
-                if (newIconIndex == FocusLogic.NEXT_PAGE_RIGHT_COLUMN) {
-                    newPageIndex = pageIndex + 1;
-                }
-                int row = ((CellLayout.LayoutParams) v.getLayoutParams()).cellY;
-                parent = getCellLayoutChildrenForIndex(workspace, newPageIndex);
-                if (parent != null) {
-                    iconLayout = (CellLayout) parent.getParent();
-                    matrix = FocusLogic.createSparseMatrixWithPivotColumn(iconLayout,
-                            iconLayout.getCountX(), row);
-                    newIconIndex = FocusLogic.handleKeyEvent(keyCode, matrix, FocusLogic.PIVOT,
-                            newPageIndex, pageCount, Utilities.isRtl(v.getResources()));
-                    if (newIconIndex == FocusLogic.NEXT_PAGE_FIRST_ITEM) {
-                        newIcon = handleNextPageFirstItem(workspace, hotseatLayout, pageIndex,
-                                isRtl);
-                    } else if (newIconIndex == FocusLogic.PREVIOUS_PAGE_LAST_ITEM) {
-                        newIcon = handlePreviousPageLastItem(workspace, hotseatLayout, pageIndex,
-                                isRtl);
-                    } else {
-                        newIcon = parent.getChildAt(newIconIndex);
+        // NOTE: currently we don't special case for the phone UI in different
+        // orientations, even though the hotseat is on the side in landscape mode. This
+        // is to ensure that accessibility consistency is maintained across rotations.
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        boolean wasHandled = false;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (handleKeyEvent) {
+                    ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
+                    int myIndex = views.indexOf(v);
+                    // Select the previous button, otherwise do nothing
+                    if (myIndex > 0) {
+                        views.get(myIndex - 1).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
                     }
                 }
+                wasHandled = true;
                 break;
-            case FocusLogic.PREVIOUS_PAGE_FIRST_ITEM:
-                workspaceLayout = (CellLayout) workspace.getChildAt(pageIndex - 1);
-                newIcon = getFirstFocusableIconInReadingOrder(workspaceLayout, isRtl);
-                if (newIcon == null) {
-                    // Check the hotseat if no focusable item was found on the workspace.
-                    newIcon = getFirstFocusableIconInReadingOrder(hotseatLayout, isRtl);
-                    workspace.snapToPage(pageIndex - 1);
-                }
-                break;
-            case FocusLogic.PREVIOUS_PAGE_LAST_ITEM:
-                newIcon = handlePreviousPageLastItem(workspace, hotseatLayout, pageIndex, isRtl);
-                break;
-            case FocusLogic.NEXT_PAGE_FIRST_ITEM:
-                newIcon = handleNextPageFirstItem(workspace, hotseatLayout, pageIndex, isRtl);
-                break;
-            case FocusLogic.NEXT_PAGE_LEFT_COLUMN:
-            case FocusLogic.PREVIOUS_PAGE_LEFT_COLUMN:
-                newPageIndex = pageIndex + 1;
-                if (newIconIndex == FocusLogic.PREVIOUS_PAGE_LEFT_COLUMN) {
-                    newPageIndex = pageIndex - 1;
-                }
-                row = ((CellLayout.LayoutParams) v.getLayoutParams()).cellY;
-                parent = getCellLayoutChildrenForIndex(workspace, newPageIndex);
-                if (parent != null) {
-                    iconLayout = (CellLayout) parent.getParent();
-                    matrix = FocusLogic.createSparseMatrixWithPivotColumn(iconLayout, -1, row);
-                    newIconIndex = FocusLogic.handleKeyEvent(keyCode, matrix, FocusLogic.PIVOT,
-                            newPageIndex, pageCount, Utilities.isRtl(v.getResources()));
-                    if (newIconIndex == FocusLogic.NEXT_PAGE_FIRST_ITEM) {
-                        newIcon = handleNextPageFirstItem(workspace, hotseatLayout, pageIndex,
-                                isRtl);
-                    } else if (newIconIndex == FocusLogic.PREVIOUS_PAGE_LAST_ITEM) {
-                        newIcon = handlePreviousPageLastItem(workspace, hotseatLayout, pageIndex,
-                                isRtl);
-                    } else {
-                        newIcon = parent.getChildAt(newIconIndex);
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (handleKeyEvent) {
+                    ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
+                    int myIndex = views.indexOf(v);
+                    // Select the next button, otherwise do nothing
+                    if (myIndex < views.size() - 1) {
+                        views.get(myIndex + 1).requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
                     }
                 }
+                wasHandled = true;
                 break;
-            case FocusLogic.CURRENT_PAGE_FIRST_ITEM:
-                newIcon = getFirstFocusableIconInReadingOrder(workspaceLayout, isRtl);
-                if (newIcon == null) {
-                    // Check the hotseat if no focusable item was found on the workspace.
-                    newIcon = getFirstFocusableIconInReadingOrder(hotseatLayout, isRtl);
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (handleKeyEvent) {
+                    final Workspace workspace = (Workspace) v.getRootView().findViewById(R.id.workspace);
+                    if (workspace != null) {
+                        int pageIndex = workspace.getCurrentPage();
+                        CellLayout topLayout = (CellLayout) workspace.getChildAt(pageIndex);
+                        ShortcutAndWidgetContainer children = topLayout.getShortcutsAndWidgets();
+                        final View newIcon = getIconInDirection(layout, children, -1, 1);
+                        // Select the first bubble text view in the current page of the workspace
+                        if (newIcon != null) {
+                            newIcon.requestFocus();
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                        } else {
+                            workspace.requestFocus();
+                        }
+                    }
                 }
+                wasHandled = true;
                 break;
-            case FocusLogic.CURRENT_PAGE_LAST_ITEM:
-                newIcon = getFirstFocusableIconInReverseReadingOrder(workspaceLayout, isRtl);
-                if (newIcon == null) {
-                    // Check the hotseat if no focusable item was found on the workspace.
-                    newIcon = getFirstFocusableIconInReverseReadingOrder(hotseatLayout, isRtl);
-                }
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                // Do nothing
+                wasHandled = true;
                 break;
             default:
-                // current page, some item.
-                if (0 <= newIconIndex && newIconIndex < parent.getChildCount()) {
-                    newIcon = parent.getChildAt(newIconIndex);
-                } else if (parent.getChildCount() <= newIconIndex &&
-                        newIconIndex < parent.getChildCount() + hotseatParent.getChildCount()) {
-                    newIcon = hotseatParent.getChildAt(newIconIndex - parent.getChildCount());
-                }
                 break;
         }
-        if (newIcon != null) {
-            newIcon.requestFocus();
-            playSoundEffect(keyCode, v);
-        }
-        return consume;
+        return wasHandled;
     }
-
-    //
-    // Helper methods.
-    //
 
     /**
      * Private helper method to get the CellLayoutChildren given a CellLayout index.
      */
-    @Thunk static ShortcutAndWidgetContainer getCellLayoutChildrenForIndex(
-            ViewGroup container, int i) {
+    private static ShortcutAndWidgetContainer getCellLayoutChildrenForIndex(ViewGroup container, int i) {
         CellLayout parent = (CellLayout) container.getChildAt(i);
         return parent.getShortcutsAndWidgets();
     }
 
     /**
-     * Helper method to be used for playing sound effects.
+     * Private helper method to sort all the CellLayout children in order of their (x,y) spatially
+     * from top left to bottom right.
      */
-    @Thunk static void playSoundEffect(int keyCode, View v) {
+    private static ArrayList<View> getCellLayoutChildrenSortedSpatially(CellLayout layout, ViewGroup parent) {
+        // First we order each the CellLayout children by their x,y coordinates
+        final int cellCountX = layout.getCountX();
+        final int count = parent.getChildCount();
+        ArrayList<View> views = new ArrayList<View>();
+        for (int j = 0; j < count; ++j) {
+            views.add(parent.getChildAt(j));
+        }
+        Collections.sort(views, new Comparator<View>() {
+            @Override
+            public int compare(View lhs, View rhs) {
+                CellLayout.LayoutParams llp = (CellLayout.LayoutParams) lhs.getLayoutParams();
+                CellLayout.LayoutParams rlp = (CellLayout.LayoutParams) rhs.getLayoutParams();
+                int lvIndex = (llp.cellY * cellCountX) + llp.cellX;
+                int rvIndex = (rlp.cellY * cellCountX) + rlp.cellX;
+                return lvIndex - rvIndex;
+            }
+        });
+        return views;
+    }
+
+    /**
+     * Private helper method to find the index of the next BubbleTextView or FolderIcon in the
+     * direction delta.
+     * 
+     * @param delta either -1 or 1 depending on the direction we want to search
+     */
+    private static View findIndexOfIcon(ArrayList<View> views, int i, int delta) {
+        // Then we find the next BubbleTextView offset by delta from i
+        final int count = views.size();
+        int newI = i + delta;
+        while (0 <= newI && newI < count) {
+            View newV = views.get(newI);
+            if (newV instanceof BubbleTextView || newV instanceof FolderIcon) {
+                return newV;
+            }
+            newI += delta;
+        }
+        return null;
+    }
+
+    private static View getIconInDirection(CellLayout layout, ViewGroup parent, int i, int delta) {
+        final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
+        return findIndexOfIcon(views, i, delta);
+    }
+
+    private static View getIconInDirection(CellLayout layout, ViewGroup parent, View v, int delta) {
+        final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
+        return findIndexOfIcon(views, views.indexOf(v), delta);
+    }
+
+    /**
+     * Private helper method to find the next closest BubbleTextView or FolderIcon in the direction
+     * delta on the next line.
+     * 
+     * @param delta either -1 or 1 depending on the line and direction we want to search
+     */
+    private static View getClosestIconOnLine(CellLayout layout, ViewGroup parent, View v, int lineDelta) {
+        final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
+        final CellLayout.LayoutParams lp = (CellLayout.LayoutParams) v.getLayoutParams();
+        final int cellCountY = layout.getCountY();
+        final int row = lp.cellY;
+        final int newRow = row + lineDelta;
+        if (0 <= newRow && newRow < cellCountY) {
+            float closestDistance = Float.MAX_VALUE;
+            int closestIndex = -1;
+            int index = views.indexOf(v);
+            int endIndex = (lineDelta < 0) ? -1 : views.size();
+            while (index != endIndex) {
+                View newV = views.get(index);
+                CellLayout.LayoutParams tmpLp = (CellLayout.LayoutParams) newV.getLayoutParams();
+                boolean satisfiesRow = (lineDelta < 0) ? (tmpLp.cellY < row) : (tmpLp.cellY > row);
+                if (satisfiesRow && (newV instanceof BubbleTextView || newV instanceof FolderIcon)) {
+                    float tmpDistance =
+                            (float) Math
+                                    .sqrt(Math.pow(tmpLp.cellX - lp.cellX, 2) + Math.pow(tmpLp.cellY - lp.cellY, 2));
+                    if (tmpDistance < closestDistance) {
+                        closestIndex = index;
+                        closestDistance = tmpDistance;
+                    }
+                }
+                if (index <= endIndex) {
+                    ++index;
+                } else {
+                    --index;
+                }
+            }
+            if (closestIndex > -1) {
+                return views.get(closestIndex);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Handles key events in a Workspace containing.
+     */
+    static boolean handleIconKeyEvent(View v, int keyCode, KeyEvent e) {
+        ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
+        final CellLayout layout = (CellLayout) parent.getParent();
+        final Workspace workspace = (Workspace) layout.getParent();
+        final ViewGroup launcher = (ViewGroup) workspace.getParent();
+        final ViewGroup tabs = (ViewGroup) launcher.findViewById(R.id.search_drop_target_bar);
+        final ViewGroup hotseat = (ViewGroup) launcher.findViewById(R.id.hotseat);
+        int pageIndex = workspace.indexOfChild(layout);
+        int pageCount = workspace.getChildCount();
+
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        boolean wasHandled = false;
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                if (handleKeyEvent) {
+                    // Select the previous icon or the last icon on the previous page if possible
+                    View newIcon = getIconInDirection(layout, parent, v, -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                    } else {
+                        if (pageIndex > 0) {
+                            parent = getCellLayoutChildrenForIndex(workspace, pageIndex - 1);
+                            newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
+                            if (newIcon != null) {
+                                newIcon.requestFocus();
+                            } else {
+                                // Snap to the previous page
+                                workspace.snapToPage(pageIndex - 1);
+                            }
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                        }
+                    }
+                }
+                wasHandled = true;
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
-                break;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_PAGE_DOWN:
-            case KeyEvent.KEYCODE_MOVE_END:
-                v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                if (handleKeyEvent) {
+                    // Select the next icon or the first icon on the next page if possible
+                    View newIcon = getIconInDirection(layout, parent, v, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
+                    } else {
+                        if (pageIndex < (pageCount - 1)) {
+                            parent = getCellLayoutChildrenForIndex(workspace, pageIndex + 1);
+                            newIcon = getIconInDirection(layout, parent, -1, 1);
+                            if (newIcon != null) {
+                                newIcon.requestFocus();
+                            } else {
+                                // Snap to the next page
+                                workspace.snapToPage(pageIndex + 1);
+                            }
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
+                        }
+                    }
+                }
+                wasHandled = true;
                 break;
             case KeyEvent.KEYCODE_DPAD_UP:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the previous line, otherwise select the tab bar
+                    View newIcon = getClosestIconOnLine(layout, parent, v, -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        wasHandled = true;
+                    } else {
+                        tabs.requestFocus();
+                    }
+                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the next line, otherwise select the button bar
+                    View newIcon = getClosestIconOnLine(layout, parent, v, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                        wasHandled = true;
+                    } else if (hotseat != null) {
+                        hotseat.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                    }
+                }
+                break;
             case KeyEvent.KEYCODE_PAGE_UP:
+                if (handleKeyEvent) {
+                    // Select the first icon on the previous page or the first icon on this page
+                    // if there is no previous page
+                    if (pageIndex > 0) {
+                        parent = getCellLayoutChildrenForIndex(workspace, pageIndex - 1);
+                        View newIcon = getIconInDirection(layout, parent, -1, 1);
+                        if (newIcon != null) {
+                            newIcon.requestFocus();
+                        } else {
+                            // Snap to the previous page
+                            workspace.snapToPage(pageIndex - 1);
+                        }
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    } else {
+                        View newIcon = getIconInDirection(layout, parent, -1, 1);
+                        if (newIcon != null) {
+                            newIcon.requestFocus();
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_PAGE_DOWN:
+                if (handleKeyEvent) {
+                    // Select the first icon on the next page or the last icon on this page
+                    // if there is no previous page
+                    if (pageIndex < (pageCount - 1)) {
+                        parent = getCellLayoutChildrenForIndex(workspace, pageIndex + 1);
+                        View newIcon = getIconInDirection(layout, parent, -1, 1);
+                        if (newIcon != null) {
+                            newIcon.requestFocus();
+                        } else {
+                            // Snap to the next page
+                            workspace.snapToPage(pageIndex + 1);
+                        }
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                    } else {
+                        View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
+                        if (newIcon != null) {
+                            newIcon.requestFocus();
+                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                        }
+                    }
+                }
+                wasHandled = true;
+                break;
             case KeyEvent.KEYCODE_MOVE_HOME:
-                v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                if (handleKeyEvent) {
+                    // Select the first icon on this page
+                    View newIcon = getIconInDirection(layout, parent, -1, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_END:
+                if (handleKeyEvent) {
+                    // Select the last icon on this page
+                    View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                    }
+                }
+                wasHandled = true;
                 break;
             default:
                 break;
         }
+        return wasHandled;
     }
 
     /**
-     * Returns whether the key event represents a valid uninstall key chord.
+     * Handles key events for items in a Folder.
      */
-    private static boolean isUninstallKeyChord(KeyEvent event) {
-        int keyCode = event.getKeyCode();
-        return (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_FORWARD_DEL) &&
-                event.hasModifiers(KeyEvent.META_CTRL_ON | KeyEvent.META_SHIFT_ON);
-    }
+    static boolean handleFolderKeyEvent(View v, int keyCode, KeyEvent e) {
+        ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
+        final CellLayout layout = (CellLayout) parent.getParent();
+        final ScrollView scrollView = (ScrollView) layout.getParent();
+        final Folder folder = (Folder) scrollView.getParent();
+        View title = folder.mFolderName;
 
-    /**
-     * Returns whether the key event represents a valid delete key chord.
-     */
-    private static boolean isDeleteKeyChord(KeyEvent event) {
-        int keyCode = event.getKeyCode();
-        return (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_FORWARD_DEL) &&
-                event.hasModifiers(KeyEvent.META_CTRL_ON);
-    }
-
-    private static View handlePreviousPageLastItem(Workspace workspace, CellLayout hotseatLayout,
-            int pageIndex, boolean isRtl) {
-        if (pageIndex - 1 < 0) {
-            return null;
-        }
-        CellLayout workspaceLayout = (CellLayout) workspace.getChildAt(pageIndex - 1);
-        View newIcon = getFirstFocusableIconInReverseReadingOrder(workspaceLayout, isRtl);
-        if (newIcon == null) {
-            // Check the hotseat if no focusable item was found on the workspace.
-            newIcon = getFirstFocusableIconInReverseReadingOrder(hotseatLayout,isRtl);
-            workspace.snapToPage(pageIndex - 1);
-        }
-        return newIcon;
-    }
-
-    private static View handleNextPageFirstItem(Workspace workspace, CellLayout hotseatLayout,
-            int pageIndex, boolean isRtl) {
-        if (pageIndex + 1 >= workspace.getPageCount()) {
-            return null;
-        }
-        CellLayout workspaceLayout = (CellLayout) workspace.getChildAt(pageIndex + 1);
-        View newIcon = getFirstFocusableIconInReadingOrder(workspaceLayout, isRtl);
-        if (newIcon == null) {
-            // Check the hotseat if no focusable item was found on the workspace.
-            newIcon = getFirstFocusableIconInReadingOrder(hotseatLayout, isRtl);
-            workspace.snapToPage(pageIndex + 1);
-        }
-        return newIcon;
-    }
-
-    private static View getFirstFocusableIconInReadingOrder(CellLayout cellLayout, boolean isRtl) {
-        View icon;
-        int countX = cellLayout.getCountX();
-        for (int y = 0; y < cellLayout.getCountY(); y++) {
-            int increment = isRtl ? -1 : 1;
-            for (int x = isRtl ? countX - 1 : 0; 0 <= x && x < countX; x += increment) {
-                if ((icon = cellLayout.getChildAt(x, y)) != null && icon.isFocusable()) {
-                    return icon;
+        final int action = e.getAction();
+        final boolean handleKeyEvent = (action != KeyEvent.ACTION_UP);
+        boolean wasHandled = false;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (handleKeyEvent) {
+                    // Select the previous icon
+                    View newIcon = getIconInDirection(layout, parent, v, -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT);
+                    }
                 }
-            }
-        }
-        return null;
-    }
-
-    private static View getFirstFocusableIconInReverseReadingOrder(CellLayout cellLayout,
-            boolean isRtl) {
-        View icon;
-        int countX = cellLayout.getCountX();
-        for (int y = cellLayout.getCountY() - 1; y >= 0; y--) {
-            int increment = isRtl ? 1 : -1;
-            for (int x = isRtl ? 0 : countX - 1; 0 <= x && x < countX; x += increment) {
-                if ((icon = cellLayout.getChildAt(x, y)) != null && icon.isFocusable()) {
-                    return icon;
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (handleKeyEvent) {
+                    // Select the next icon
+                    View newIcon = getIconInDirection(layout, parent, v, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                    } else {
+                        title.requestFocus();
+                    }
+                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT);
                 }
-            }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the previous line
+                    View newIcon = getClosestIconOnLine(layout, parent, v, -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (handleKeyEvent) {
+                    // Select the closest icon in the next line
+                    View newIcon = getClosestIconOnLine(layout, parent, v, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                    } else {
+                        title.requestFocus();
+                    }
+                    v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_HOME:
+                if (handleKeyEvent) {
+                    // Select the first icon on this page
+                    View newIcon = getIconInDirection(layout, parent, -1, 1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                    }
+                }
+                wasHandled = true;
+                break;
+            case KeyEvent.KEYCODE_MOVE_END:
+                if (handleKeyEvent) {
+                    // Select the last icon on this page
+                    View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
+                    if (newIcon != null) {
+                        newIcon.requestFocus();
+                        v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
+                    }
+                }
+                wasHandled = true;
+                break;
+            default:
+                break;
         }
-        return null;
+        return wasHandled;
     }
 }

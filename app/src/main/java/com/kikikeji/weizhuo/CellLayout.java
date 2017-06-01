@@ -50,7 +50,6 @@ import android.view.animation.DecelerateInterpolator;
 import com.kikikeji.weizhuo.BubbleTextView.BubbleTextShadowHandler;
 import com.kikikeji.weizhuo.FolderIcon.FolderRingAnimator;
 import com.kikikeji.weizhuo.accessibility.DragAndDropAccessibilityDelegate;
-import com.kikikeji.weizhuo.accessibility.FolderAccessibilityHelper;
 import com.kikikeji.weizhuo.accessibility.WorkspaceAccessibilityHelper;
 import com.kikikeji.weizhuo.much.MuchConfig;
 import com.kikikeji.weizhuo.util.ParcelableSparseArray;
@@ -351,10 +350,10 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
             if (dragType == WORKSPACE_ACCESSIBILITY_DRAG &&
                     !(mTouchHelper instanceof WorkspaceAccessibilityHelper)) {
                 mTouchHelper = new WorkspaceAccessibilityHelper(this);
-            } else if (dragType == FOLDER_ACCESSIBILITY_DRAG &&
+            }/* else if (dragType == FOLDER_ACCESSIBILITY_DRAG &&
                     !(mTouchHelper instanceof FolderAccessibilityHelper)) {
                 mTouchHelper = new FolderAccessibilityHelper(this);
-            }
+            }*/
             ViewCompat.setAccessibilityDelegate(this, mTouchHelper);
             setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
             getShortcutsAndWidgets().setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -3066,6 +3065,11 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
             return "Cell[view=" + (cell == null ? "null" : cell.getClass())
                     + ", x=" + cellX + ", y=" + cellY + "]";
         }
+    }
+
+    public boolean getVacantCell(int[] vacant, int spanX, int spanY) {
+
+        return Utilities.findVacantCell(vacant, spanX, spanY, mCountX, mCountY, mOccupied);
     }
 
     public boolean findVacantCell(int spanX, int spanY, int[] outXY) {

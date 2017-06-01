@@ -186,6 +186,10 @@ public class DeviceProfile {
                 .getDimensionPixelSize(R.dimen.all_apps_button_scale_down);
     }
 
+    boolean isPhone() {
+        return !isTablet && !isLargeTablet;
+    }
+
     private void updateAvailableDimensions(DisplayMetrics dm, Resources res) {
         // Check to see if the icons fit in the new available height.  If not, then we need to
         // shrink the icon size.
@@ -626,7 +630,7 @@ public class DeviceProfile {
 
             // lp.width = Math.min(availableWidthPx, maxWidth);
             lp.width = availableWidthPx;
-            lp.height = DensityUtils.dip2px(launcher,240);
+            lp.height = DensityUtils.dip2px(launcher, 240);
             overviewMode.setLayoutParams(lp);
 
             if (lp.width > totalItemWidth && visibleChildCount > 1) {

@@ -1086,7 +1086,7 @@ public class LauncherModel extends BroadcastReceiver
                 folderInfo.screenId = c.getInt(screenIndex);
                 folderInfo.cellX = c.getInt(cellXIndex);
                 folderInfo.cellY = c.getInt(cellYIndex);
-                folderInfo.options = c.getInt(optionsIndex);
+               // folderInfo.options = c.getInt(optionsIndex);
 
                 return folderInfo;
             }
@@ -2227,7 +2227,7 @@ public class LauncherModel extends BroadcastReceiver
                                     folderInfo.cellY = c.getInt(cellYIndex);
                                     folderInfo.spanX = 1;
                                     folderInfo.spanY = 1;
-                                    folderInfo.options = c.getInt(optionsIndex);
+                                  //  folderInfo.options = c.getInt(optionsIndex);
 
                                     // check & update map of what's occupied
                                     if (!checkItemPlacement(occupied, folderInfo, sBgWorkspaceScreens)) {

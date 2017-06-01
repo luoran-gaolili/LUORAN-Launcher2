@@ -19,11 +19,7 @@ package com.kikikeji.weizhuo.util;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
-import android.util.Log;
 
 import com.kikikeji.weizhuo.FolderInfo;
 import com.kikikeji.weizhuo.ItemInfo;
@@ -174,7 +170,7 @@ public class ManagedProfileHeuristic {
             long folderId = mPrefs.getLong(folderIdKey, 0);
             final FolderInfo workFolder = mModel.findFolderById(folderId);
 
-            if (workFolder == null || !workFolder.hasOption(FolderInfo.FLAG_WORK_FOLDER)) {
+            if (workFolder == null ) {
                 // Could not get a work folder. Add all the icons to homescreen.
                 mHomescreenApps.addAll(mWorkFolderApps);
                 return;
@@ -196,7 +192,7 @@ public class ManagedProfileHeuristic {
             // Create a new folder.
             final FolderInfo workFolder = new FolderInfo();
             workFolder.title = mContext.getText(R.string.work_folder_name);
-            workFolder.setOption(FolderInfo.FLAG_WORK_FOLDER, true, null);
+           // workFolder.setOption(FolderInfo.FLAG_WORK_FOLDER, true, null);
 
             // Add all shortcuts before adding it to the UI, as an empty folder might get deleted.
             for (ShortcutInfo info : mWorkFolderApps) {

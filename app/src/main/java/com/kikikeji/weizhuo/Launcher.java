@@ -1604,6 +1604,14 @@ public class Launcher extends Activity
         return favorite;
     }
 
+    View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
+        BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
+        favorite.applyFromShortcutInfo(info, mIconCache, true);
+        favorite.setOnClickListener(this);
+        favorite.setOnFocusChangeListener(mFocusHandler);
+        return favorite;
+    }
+
     /**
      * Add a shortcut to the workspace.
      *
@@ -3309,18 +3317,9 @@ public class Launcher extends Activity
      */
     public void openFolder(FolderIcon folderIcon) {
         Folder folder = folderIcon.getFolder();
-        Folder openFolder = mWorkspace != null ? mWorkspace.getOpenFolder() : null;
-        if (openFolder != null && openFolder != folder) {
-            // Close any open folder before opening a folder.
-            closeFolder();
-        }
-
         FolderInfo info = folder.mInfo;
 
         info.opened = true;
-
-        // While the folder is open, the position of the icon cannot change.
-        ((CellLayout.LayoutParams) folderIcon.getLayoutParams()).canReorder = false;
 
         // Just verify that the folder hasn't already been added to the DragLayer.
         // There was a one-off crash where the folder had a parent already.
@@ -3328,9 +3327,9 @@ public class Launcher extends Activity
             mDragLayer.addView(folder);
             mDragController.addDropTarget((DropTarget) folder);
         } else {
-            Log.w(TAG, "Opening folder (" + folder + ") which already has a parent (" +
-                    folder.getParent() + ").");
+            Log.w(TAG, "Opening folder (" + folder + ") which already has a parent (" + folder.getParent() + ").");
         }
+       // hideWorkspaceSearchAndHotseat();
         folder.animateOpen();
         growAndFadeOutFolderIcon(folderIcon);
 
@@ -3360,20 +3359,18 @@ public class Launcher extends Activity
         ViewGroup parent = (ViewGroup) folder.getParent().getParent();
         if (parent != null) {
             FolderIcon fi = (FolderIcon) mWorkspace.getViewForTag(folder.mInfo);
-            shrinkAndFadeInFolderIcon(fi, animate);
-            if (fi != null) {
-                ((CellLayout.LayoutParams) fi.getLayoutParams()).canReorder = true;
-            }
+            shrinkAndFadeInFolderIcon(fi, true);
         }
-        if (animate) {
-            folder.animateClosed();
-        } else {
-            folder.close(false);
-        }
+        folder.animateClosed();
+        showWorkspaceSearchAndHotseat();
 
-        // Notify the accessibility manager that this folder "window" has disappeared and no
-        // longer occludes the workspace items
+        // Notify the accessibility manager that this folder "window" has disappeard and no
+        // longer occludeds the workspace items
         getDragLayer().sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void removeFolder(FolderInfo folder) {
+        sFolders.remove(folder.id);
     }
 
     public boolean onLongClick(View v) {

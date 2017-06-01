@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.kikikeji.weizhuo.accessibility.LauncherAccessibilityDelegate;
@@ -44,7 +45,7 @@ public class LauncherAppState {
     final LauncherModel mModel;
     private final IconCache mIconCache;
     private final WidgetPreviewLoader mWidgetCache;
-
+    private boolean mIsScreenLarge;
     private boolean mWallpaperChangedSinceLastCheck;
     private RgkWidgetPreviewLoader.CacheDb mWidgetPreviewCacheDb;
     private static WeakReference<LauncherProvider> sLauncherProvider;
@@ -81,7 +82,9 @@ public class LauncherAppState {
         }
         sContext = context.getApplicationContext();
     }
-
+    public boolean isScreenLarge() {
+        return mIsScreenLarge;
+    }
     private LauncherAppState() {
         if (sContext == null) {
             throw new IllegalStateException("LauncherAppState inited before app context set");
@@ -92,7 +95,7 @@ public class LauncherAppState {
         if (TestingUtils.MEMORY_DUMP_ENABLED) {
             TestingUtils.startTrackingMemory(sContext);
         }
-
+        mIsScreenLarge = isScreenLarge(sContext.getResources());
         mInvariantDeviceProfile = new InvariantDeviceProfile(sContext);
         mIconCache = new IconCache(sContext, mInvariantDeviceProfile);
         mWidgetCache = new WidgetPreviewLoader(sContext, mIconCache);
@@ -119,7 +122,9 @@ public class LauncherAppState {
         sContext.registerReceiver(
                 new WallpaperChangedReceiver(), new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED));
     }
-
+    public static boolean isScreenLarge(Resources res) {
+        return res.getBoolean(R.bool.is_large_tablet);
+    }
     /**
      * Call from Application.onTerminate(), which is not guaranteed to ever be called.
      */

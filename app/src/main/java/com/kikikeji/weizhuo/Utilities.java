@@ -168,6 +168,10 @@ public final class Utilities {
         }
     }
 
+    public static boolean isLmpOrAbove() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    }
+
     /**
      * Returns a bitmap suitable for the all apps view. If the package or the resource do not
      * exist, it returns null.

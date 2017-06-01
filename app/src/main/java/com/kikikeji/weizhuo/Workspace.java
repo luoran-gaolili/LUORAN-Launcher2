@@ -110,7 +110,9 @@ public class Workspace extends PagedView
     private static final long CUSTOM_CONTENT_GESTURE_DELAY = 200;
     private long mTouchDownTime = -1;
     private long mCustomContentShowTime = -1;
-
+    private int mSavedScrollX;
+    private float mSavedRotationY;
+    private float mSavedTranslationX;
     private LayoutTransition mLayoutTransition;
     @Thunk
     final WallpaperManager mWallpaperManager;
@@ -914,7 +916,7 @@ public class Workspace extends PagedView
         }
         customScreen.removeAllViews();
         customContent.setFocusable(true);
-        customContent.setOnKeyListener(new FullscreenKeyEventListener());
+        //customContent.setOnKeyListener(new FullscreenKeyEventListener());
         customContent.setOnFocusChangeListener(mLauncher.mFocusHandler
                 .getHideIndicatorOnFocusListener());
         customScreen.addViewToCellLayout(customContent, 0, 0, lp, true);
@@ -5203,7 +5205,27 @@ public class Workspace extends PagedView
             }
         }
     }
+    public void setFinalScrollForPageChange(int pageIndex) {
+        CellLayout cl = (CellLayout) getChildAt(pageIndex);
+        if (cl != null) {
+            mSavedScrollX = getScrollX();
+            mSavedTranslationX = cl.getTranslationX();
+            mSavedRotationY = cl.getRotationY();
+            final int newX = getScrollForPage(pageIndex);
+            setScrollX(newX);
+            cl.setTranslationX(0f);
+            cl.setRotationY(0f);
+        }
+    }
 
+    public void resetFinalScrollForPageChange(int pageIndex) {
+        if (pageIndex >= 0) {
+            CellLayout cl = (CellLayout) getChildAt(pageIndex);
+            setScrollX(mSavedScrollX);
+            cl.setTranslationX(mSavedTranslationX);
+            cl.setRotationY(mSavedRotationY);
+        }
+    }
     void updateShortcuts(ArrayList<ShortcutInfo> shortcuts) {
         final HashSet<ShortcutInfo> updates = new HashSet<ShortcutInfo>(shortcuts);
         mapOverItems(MAP_RECURSE, new ItemOperator() {
