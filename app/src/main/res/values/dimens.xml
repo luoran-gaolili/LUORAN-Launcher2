@@ -199,4 +199,12 @@
     <dimen name="app_widget_preview_label_horizontal_padding">8dp</dimen>
     <!--add lallapp code by zhaopenglin 20170313 end-->
     <dimen name="folder_name_padding">10dp</dimen>
+    <dimen name="much_app_icon_size">48dp</dimen>
+    <dimen name="folder_cell_width">74dp</dimen>
+    <dimen name="folder_cell_height">80dp</dimen>
+    <dimen name="much_workspace_indicator_item_padding">6dp</dimen>
+    <dimen name="landscape_folder_item_drag_x_coordinate_offset">180dp</dimen>
+    <dimen name="landscape_folder_item_drag_y_coordinate_offset">95dp</dimen>
+    <dimen name="portait_folder_item_drag_x_coordinate_offset">40dp</dimen>
+    <dimen name="portait_folder_item_drag_y_coordinate_offset">220dp</dimen>
 </resources>

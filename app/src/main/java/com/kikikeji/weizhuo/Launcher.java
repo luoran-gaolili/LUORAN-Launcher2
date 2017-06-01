@@ -50,6 +50,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -104,7 +105,9 @@ import com.kikikeji.weizhuo.compat.UserHandleCompat;
 import com.kikikeji.weizhuo.compat.UserManagerCompat;
 import com.kikikeji.weizhuo.model.WidgetsModel;
 import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.overview.ui.ImageHelper;
 import com.kikikeji.weizhuo.overview.ui.OverViewTabs;
+import com.kikikeji.weizhuo.overview.ui.ScreenCapture;
 import com.kikikeji.weizhuo.util.ComponentKey;
 import com.kikikeji.weizhuo.util.LongArrayMap;
 import com.kikikeji.weizhuo.util.TestingUtils;
@@ -3316,6 +3319,7 @@ public class Launcher extends Activity
      * @param folderInfo The FolderInfo describing the folder to open.
      */
     public void openFolder(FolderIcon folderIcon) {
+        Log.d("LR6661", "openFolder");
         Folder folder = folderIcon.getFolder();
         FolderInfo info = folder.mInfo;
 
@@ -3325,11 +3329,15 @@ public class Launcher extends Activity
         // There was a one-off crash where the folder had a parent already.
         if (folder.getParent() == null) {
             mDragLayer.addView(folder);
+
+            if (MuchConfig.SUPPORT_MUCH_STYLE) {
+                applyBlur(folder);
+            }
             mDragController.addDropTarget((DropTarget) folder);
         } else {
             Log.w(TAG, "Opening folder (" + folder + ") which already has a parent (" + folder.getParent() + ").");
         }
-       // hideWorkspaceSearchAndHotseat();
+        hideWorkspaceSearchAndHotseat();
         folder.animateOpen();
         growAndFadeOutFolderIcon(folderIcon);
 
@@ -3337,6 +3345,33 @@ public class Launcher extends Activity
         // the workspace items
         folder.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
         getDragLayer().sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
+    }
+
+    /**
+     * auther:linmaoqing
+     * date  : 2014-5-13
+     *
+     * @param folder 实现文件夹背景磨砂效果
+     */
+    private void applyBlur(final Folder folder) {
+        Log.w(TAG, "folder = " + folder);
+        folder.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+
+                folder.getViewTreeObserver().removeOnPreDrawListener(this);
+                Context context = getApplicationContext();
+                ScreenCapture capture = new ScreenCapture(context);
+                Bitmap screenBmp = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_02);
+               /* if(screenBmp == null){
+                    Log.d("LUORAN", "screenBmp = "+screenBmp);
+                    screenBmp = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_02);
+                }*/
+                Log.d("LUORAN", "screenBmp = " + screenBmp);
+                ImageHelper.blur(context, folder, screenBmp);
+                return true;
+            }
+        });
     }
 
     public void closeFolder() {

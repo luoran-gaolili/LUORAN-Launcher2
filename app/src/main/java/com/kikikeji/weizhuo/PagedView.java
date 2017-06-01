@@ -181,7 +181,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
 
     protected int mActivePointerId = INVALID_POINTER;
 
-    private PageSwitchListener mPageSwitchListener;
+    public PageSwitchListener mPageSwitchListener;
 
     // If true, modify alpha of neighboring pages as user scrolls left/right
     protected boolean mFadeInAdjacentScreens = false;
