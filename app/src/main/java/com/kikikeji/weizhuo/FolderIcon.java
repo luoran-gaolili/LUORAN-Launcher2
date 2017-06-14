@@ -28,7 +28,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
 
 
 /**
@@ -339,7 +339,6 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
         mFolderRingAnimator.setCellLayout(layout);
         mFolderRingAnimator.animateToAcceptState();
         layout.showFolderAccept(mFolderRingAnimator);
-        //modify by luoran
         //mOpenAlarm.setOnAlarmListener(mOnOpenListener);
         if (SPRING_LOADING_ENABLED && ((dragInfo instanceof AppInfo) || (dragInfo instanceof ShortcutInfo))) {
             // TODO: we currently don't support spring-loading for PendingAddShortcutInfos even
@@ -351,8 +350,7 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
         mDragInfo = (ItemInfo) dragInfo;
     }
 
-    public void onDragOver(Object dragInfo) {
-    }
+    public void onDragOver(Object dragInfo) {}
 
     OnAlarmListener mOnOpenListener = new OnAlarmListener() {
         public void onAlarm(Alarm alarm) {
@@ -367,14 +365,12 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
                 item = (ShortcutInfo) mDragInfo;
             }
             mFolder.beginExternalDrag(item);
-            Log.d("LR6661", "mOnOpenListener");
-            //modify by luoran  屏蔽长按图标 文件夹打开事件
             mLauncher.openFolder(FolderIcon.this);
         }
     };
 
     public void performCreateAnimation(final ShortcutInfo destInfo, final View destView, final ShortcutInfo srcInfo,
-                                       final DragView srcView, Rect dstRect, float scaleRelativeToDragLayer, Runnable postAnimationRunnable) {
+            final DragView srcView, Rect dstRect, float scaleRelativeToDragLayer, Runnable postAnimationRunnable) {
 
         // These correspond two the drawable and view that the icon was dropped _onto_
         Drawable animateDrawable = getTopDrawable((TextView) destView);
@@ -408,7 +404,7 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     }
 
     private void onDrop(final ShortcutInfo item, DragView animateView, Rect finalRect, float scaleRelativeToDragLayer,
-                        int index, Runnable postAnimationRunnable, DropTarget.DragObject d) {
+            int index, Runnable postAnimationRunnable, DropTarget.DragObject d) {
         item.cellX = -1;
         item.cellY = -1;
 
@@ -573,7 +569,7 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
             d.setBounds(0, 0, mIntrinsicIconSize, mIntrinsicIconSize);
             if (d instanceof FastBitmapDrawable) {
                 FastBitmapDrawable fd = (FastBitmapDrawable) d;
-                int oldBrightness = (int) fd.getBrightness();
+                int oldBrightness = (int)fd.getBrightness();
                 fd.setBrightness(params.overlayAlpha);
                 d.draw(canvas);
                 fd.setBrightness(oldBrightness);
@@ -629,7 +625,7 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     }
 
     private void animateFirstItem(final Drawable d, int duration, final boolean reverse,
-                                  final Runnable onCompleteRunnable) {
+            final Runnable onCompleteRunnable) {
         final PreviewItemDrawingParams finalParams = computePreviewItemDrawingParams(0, null);
 
         final float scale0 = 1.0f;

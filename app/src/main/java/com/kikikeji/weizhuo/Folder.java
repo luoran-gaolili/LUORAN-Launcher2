@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.support.v4.widget.AutoScrollHelper;
 import android.text.InputType;
@@ -32,7 +31,7 @@ import android.text.Spannable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,12 +48,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.kikikeji.weizhuo.accessibility.LauncherAccessibilityDelegate;
-import com.kikikeji.weizhuo.much.MuchConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 
 /**
@@ -79,27 +76,13 @@ public class Folder extends LinearLayout
     static final int STATE_SMALL = 0;
     static final int STATE_ANIMATING = 1;
     static final int STATE_OPEN = 2;
-    private int DRAG_MODE_NONE = 0;
-    private int DRAG_MODE_REORDER = 1;
-    private int mDragMode = DRAG_MODE_NONE;
+
     private static final int CLOSE_FOLDER_DELAY_MS = 150;
 
     private int mExpandDuration;
     private int mMaterialExpandDuration;
     private int mMaterialExpandStagger;
-    //protected CellLayout mContent;
-    protected MuchFolderCellLayout mCellLayout;
-    protected MuchFolderPageView mContent;
-    private MuchFolderPageView.MuchPagedViewChangeListener mPageChangeListener;
-    private MuchFolderPageView.MyPagerAdapter mPageAdapter;
-    private MuchFolderPagedViewIndicator mViewPageIndicator;
-    private int mIndicatorHeight;
-    private ObjectAnimator mOpenCloseAnimator;
-    private int mStatusBarHeigth = 0;
-    private final static int CELL_COUNT_X = 4;
-    private final static int CELL_COUNT_Y = 3;
-    private LinearLayout mFolderFrame;
-
+    protected CellLayout mContent;
     private ScrollView mScrollView;
     private final LayoutInflater mInflater;
     private final IconCache mIconCache;
@@ -164,25 +147,22 @@ public class Folder extends LinearLayout
         super(context, attrs);
 
         LauncherAppState app = LauncherAppState.getInstance();
-        DeviceProfile grid = app.getInvariantDeviceProfile().portraitProfile;
+        InvariantDeviceProfile grid = app.getInvariantDeviceProfile();
         setAlwaysDrawnWithCacheEnabled(false);
         mInflater = LayoutInflater.from(context);
         mIconCache = app.getIconCache();
 
         Resources res = getResources();
-        mMaxCountX = (int) grid.LRallAppsNumCols;
-        Log.d("GLL123", "mMaxCountX:" + mMaxCountX);
+        mMaxCountX = (int) grid.numColumns;
         // Allow scrolling folders when DISABLE_ALL_APPS is true.
         if (LauncherAppState.isDisableAllApps()) {
             mMaxCountY = mMaxNumItems = Integer.MAX_VALUE;
         } else {
-            mMaxCountY = 6;
+            mMaxCountY = (int) grid.numRows;
             mMaxNumItems = mMaxCountX * mMaxCountY;
+            //Log.d("LUORANGLL", "mMaxNumItems:" + mMaxNumItems);
         }
-        //LUORAN
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            mMaxNumItems = CELL_COUNT_X * CELL_COUNT_Y;
-        }
+
         mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         mExpandDuration = res.getInteger(R.integer.config_folderExpandDuration);
@@ -205,42 +185,20 @@ public class Folder extends LinearLayout
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        // mScrollView = (ScrollView) findViewById(R.id.scroll_view);
-        //mContent = (CellLayout) findViewById(R.id.folder_content);
+        mScrollView = (ScrollView) findViewById(R.id.scroll_view);
+        mContent = (CellLayout) findViewById(R.id.folder_content);
 
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            mFolderFrame = (LinearLayout) findViewById(R.id.folder_frame);
-            mCellLayout = (MuchFolderCellLayout) mInflater.inflate(R.layout.much_folder_screen, null);
-            mContent = (MuchFolderPageView) findViewById(R.id.folder_page);
-            mContent.setLayoutInflater(mInflater);
-            mPageAdapter = mContent.new MyPagerAdapter(mCellLayout);
-            mContent.setAdapter(mPageAdapter);
-            mPageChangeListener = mContent.new MuchPagedViewChangeListener();
-            mContent.setOnPageChangeListener(mPageChangeListener);
-            mViewPageIndicator = (MuchFolderPagedViewIndicator) findViewById(R.id.folder_indicator);
-            mContent.addFolderViewPageListener(mViewPageIndicator);
-            mIndicatorHeight = mViewPageIndicator.getMaxHeigh();
-        } else {
-            mScrollView = (ScrollView) findViewById(R.id.scroll_view);
-//        mContent = (CellLayout) findViewById(R.id.folder_content);
-        }
-        //end by linmaoqing
+        mFocusIndicatorHandler = new FocusIndicatorView(getContext());
+        mContent.addView(mFocusIndicatorHandler, 0);
+        mFocusIndicatorHandler.getLayoutParams().height = FocusIndicatorView.DEFAULT_LAYOUT_SIZE;
+        mFocusIndicatorHandler.getLayoutParams().width = FocusIndicatorView.DEFAULT_LAYOUT_SIZE;
+
         LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getInvariantDeviceProfile().portraitProfile;
 
         mContent.setCellDimensions(grid.folderCellWidthPx, grid.folderCellHeightPx);
         mContent.setGridSize(0, 0);
         mContent.getShortcutsAndWidgets().setMotionEventSplittingEnabled(false);
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            mContent.setGridSize(CELL_COUNT_X, CELL_COUNT_Y);
-        } else {
-            mContent.setGridSize(0, 0);
-        }
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            setAllContainersMotionEventSplittingEnabled(false);
-        } else {
-            mContent.getShortcutsAndWidgets().setMotionEventSplittingEnabled(false);
-        }
         mContent.setInvertIfRtl(true);
         mFolderName = (FolderEditText) findViewById(R.id.folder_name);
         mFolderName.setFolder(this);
@@ -255,22 +213,10 @@ public class Folder extends LinearLayout
         // We disable action mode for now since it messes up the view on phones
         mFolderName.setCustomSelectionActionModeCallback(mActionModeCallback);
         mFolderName.setOnEditorActionListener(this);
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            mFolderName.setSelectAllOnFocus(true);
-        }
-        mFolderName.setInputType(mFolderName.getInputType() |
-                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            mAutoScrollHelper = new FolderAutoScrollHelper(mScrollView);  //modify by linmaoqing 2014-5-13
-        }
-    }
-
-    private void setAllContainersMotionEventSplittingEnabled(boolean b) {
-        List<ShortcutAndWidgetContainer> containerList = mContent.getAllShortcutsAndWidgets();
-        int size = containerList.size();
-        for (int i = 0; i < size; i++) {
-            containerList.get(i).setMotionEventSplittingEnabled(b);
-        }
+        mFolderName.setSelectAllOnFocus(true);
+        mFolderName.setInputType(mFolderName.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        mAutoScrollHelper = new FolderAutoScrollHelper(mScrollView);
     }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -315,12 +261,7 @@ public class Folder extends LinearLayout
             mEmptyCell[1] = item.cellY;
             mCurrentDragView = v;
 
-            //add by linmaoqing 2014-5-13
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                mContent.removeIconView(mCurrentDragView);
-            } else {
-                mContent.removeView(mCurrentDragView);
-            }//end by linmaoqing
+            mContent.removeView(mCurrentDragView);
             mInfo.remove(mCurrentDragInfo);
             mDragInProgress = true;
             mItemAddedBackToSelfViaIcon = false;
@@ -374,7 +315,7 @@ public class Folder extends LinearLayout
         return mFolderName;
     }
 
-    public MuchFolderPageView getContent() {
+    public CellLayout getContent() {
         return mContent;
     }
 
@@ -383,14 +324,7 @@ public class Folder extends LinearLayout
      */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        //add by linmaoqing 2014-5-13
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            float touchX = ev.getX();
-            float touchY = ev.getY();
-            if (!isPointInFolderFrame((int) touchX, (int) touchY)) {
-                mLauncher.closeFolder();
-            }
-        } //end by linmaoqing
+        mLauncher.closeFolder();//luoran
         return true;
     }
 
@@ -485,11 +419,9 @@ public class Folder extends LinearLayout
         // If our folder has too many items we prune them from the list. This is an issue
         // when upgrading from the old Folders implementation which could contain an unlimited
         // number of items.
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {  //add by linmaoqing 2014-5-13
-            for (ShortcutInfo item : overflow) {
-                mInfo.remove(item);
-                LauncherModel.deleteItemFromDatabase(mLauncher, item);
-            }
+        for (ShortcutInfo item : overflow) {
+            mInfo.remove(item);
+            LauncherModel.deleteItemFromDatabase(mLauncher, item);
         }
 
         mItemsInvalidated = true;
@@ -520,7 +452,7 @@ public class Folder extends LinearLayout
      * @return A new UserFolder.
      */
     static Folder fromXml(Context context) {
-        return (Folder) LayoutInflater.from(context).inflate(MuchConfig.SUPPORT_MUCH_STYLE ? R.layout.much_user_folder : R.layout.user_folder, null);
+        return (Folder) LayoutInflater.from(context).inflate(R.layout.user_folder, null);
     }
 
     /**
@@ -583,7 +515,7 @@ public class Folder extends LinearLayout
 
             int rx = (int) Math.max(Math.max(width - getPivotX(), 0), getPivotX());
             int ry = (int) Math.max(Math.max(height - getPivotY(), 0), getPivotY());
-            float radius = (float) Math.sqrt(rx * rx + ry * ry);
+            float radius = (float) Math.sqrt(rx * rx + ry * ry) * 2;
             AnimatorSet anim = LauncherAnimUtils.createAnimatorSet();
             Animator reveal =
                     LauncherAnimUtils.createCircularReveal(this, (int) getPivotX(), (int) getPivotY(), 0, radius);
@@ -610,7 +542,7 @@ public class Folder extends LinearLayout
             anim.play(drift);
             anim.play(iconsAlpha);
             anim.play(textAlpha);
-            //  anim.play(reveal);
+            anim.play(reveal);
 
             openFolderAnim = anim;
 
@@ -682,7 +614,6 @@ public class Folder extends LinearLayout
     }
 
     public void animateClosed() {
-
         if (!(getParent() instanceof DragLayer)) return;
         PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 0);
         PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat("scaleX", 0.9f);
@@ -827,67 +758,34 @@ public class Folder extends LinearLayout
 
     public void onDragOver(DragObject d) {
         final DragView dragView = d.dragView;
-        //  final int scrollOffset = mScrollView.getScrollY() - 580;//修改这里就可以达到拖拽时可以挤占要挤占的位置
-        int scrollOffset = 0;    //delete final by linmaoqing 2014-5-13
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) { //add by linmaoqing 2014-5-14
-            scrollOffset = mScrollView.getScrollY();
-        }//end by linmaoqing
-        // Log.e("zhao11folder", "scrollOffset:" + scrollOffset + "," + mScrollView.getPaddingTop());
+        final int scrollOffset = mScrollView.getScrollY() - mScrollView.getTop() - 10;
         final float[] r = getDragViewVisualCenter(d.x, d.y, d.xOffset, d.yOffset, dragView, null);
-        int centerCoordinateOffset[] = new int[2];
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            if (LauncherAppState.isScreenLandscape(mLauncher)) {
-                Log.d("Drag","if");
-                centerCoordinateOffset[0] = getResources().getDimensionPixelOffset(R.dimen.landscape_folder_item_drag_x_coordinate_offset);
-                centerCoordinateOffset[1] = getResources().getDimensionPixelOffset(R.dimen.landscape_folder_item_drag_x_coordinate_offset);
-            } else {
-                Log.d("Drag","else");
-                centerCoordinateOffset[0] = getResources().getDimensionPixelOffset(R.dimen.portait_folder_item_drag_x_coordinate_offset);
-                centerCoordinateOffset[1] = getResources().getDimensionPixelOffset(R.dimen.portait_folder_item_drag_y_coordinate_offset);
-            }
-        }
-        //add by linmaoqing 2014-5-13
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            if (!isPointInFolderFrame((int) r[0], (int) r[1])) {
-                mLauncher.closeFolder();
-                return;
-            }
-        }//end by linmaoqing
+        r[0] -= getPaddingLeft();
+        r[1] -= getPaddingTop();
+        r[0] -= mScrollView.getLeft() - 10;
         final long downTime = SystemClock.uptimeMillis();
-        final MotionEvent translatedEv = MotionEvent.obtain(
-                downTime, downTime, MotionEvent.ACTION_MOVE, d.x, d.y, 0);
-        //modify by linmaoqing 2014-5-13
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            if (!mAutoScrollHelper.isEnabled()) {
-                mAutoScrollHelper.setEnabled(true);
-            }
-        }//end by linmaoqing
+        final MotionEvent translatedEv = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_MOVE, d.x, d.y, 0);
 
-        boolean handled = false;
-        //add by linmaoqing 2014-5-13
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            handled = mAutoScrollHelper.onTouch(this, translatedEv); //delete final by linmaoqing 2014-5-13
-        } // end by linmaoqing
+        if (!mAutoScrollHelper.isEnabled()) {
+            mAutoScrollHelper.setEnabled(true);
+        }
+
+        final boolean handled = mAutoScrollHelper.onTouch(this, translatedEv);
         translatedEv.recycle();
 
         if (handled) {
             mReorderAlarm.cancelAlarm();
         } else {
-            mTargetCell = mContent.findNearestArea(
-                    (int) r[0] - centerCoordinateOffset[0], (int) r[1] + scrollOffset - centerCoordinateOffset[1], 1, 1, mTargetCell);
+            mTargetCell = mContent.findNearestArea((int) r[0], (int) r[1] + scrollOffset, 1, 1, mTargetCell);
             if (isLayoutRtl()) {
                 mTargetCell[0] = mContent.getCountX() - mTargetCell[0] - 1;
             }
-            if (mTargetCell[0] != mPreviousTargetCell[0]
-                    || mTargetCell[1] != mPreviousTargetCell[1]) {
+            if (mTargetCell[0] != mPreviousTargetCell[0] || mTargetCell[1] != mPreviousTargetCell[1]) {
                 mReorderAlarm.cancelAlarm();
                 mReorderAlarm.setOnAlarmListener(mReorderAlarmListener);
                 mReorderAlarm.setAlarm(REORDER_DELAY);
                 mPreviousTargetCell[0] = mTargetCell[0];
                 mPreviousTargetCell[1] = mTargetCell[1];
-                mDragMode = DRAG_MODE_REORDER;
-            } else {
-                mDragMode = DRAG_MODE_NONE;
             }
         }
     }
@@ -933,12 +831,8 @@ public class Folder extends LinearLayout
     }
 
     public void onDragExit(DragObject d) {
-        //  Log.d("DRAG","onDragExit");
-        //  arrangeChildren(getItemsInReadingOrder());
         // Exiting folder; stop the auto scroller.
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            mAutoScrollHelper.setEnabled(false); //  add by linmaoqing 2014-5-13
-        }
+        mAutoScrollHelper.setEnabled(false);
         // We only close the folder if this is a true drag exit, ie. not because
         // a drop has occurred above the folder.
         if (!d.dragComplete) {
@@ -946,7 +840,6 @@ public class Folder extends LinearLayout
             mOnExitAlarm.setAlarm(ON_EXIT_CLOSE_DELAY);
         }
         mReorderAlarm.cancelAlarm();
-        mDragMode = DRAG_MODE_NONE;
     }
 
     @Override
@@ -982,9 +875,6 @@ public class Folder extends LinearLayout
 
         if (target != this) {
             if (mOnExitAlarm.alarmPending()) {
-                if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                    mCurrentDragInfo = null;
-                }
                 mOnExitAlarm.cancelAlarm();
                 if (!successfulDrop) {
                     mSuppressFolderDeletion = true;
@@ -1047,7 +937,7 @@ public class Folder extends LinearLayout
     }
 
     private void updateItemLocationsInDatabase() {
-        ArrayList<View> list = getItemsInReadingOrderWithAbCoord();
+        ArrayList<View> list = getItemsInReadingOrder();
         for (int i = 0; i < list.size(); i++) {
             View v = list.get(i);
             ItemInfo info = (ItemInfo) v.getTag();
@@ -1056,7 +946,7 @@ public class Folder extends LinearLayout
     }
 
     private void updateItemLocationsInDatabaseBatch() {
-        ArrayList<View> list = getItemsInReadingOrderWithAbCoord();
+        ArrayList<View> list = getItemsInReadingOrder();
         ArrayList<ItemInfo> items = new ArrayList<ItemInfo>();
         for (int i = 0; i < list.size(); i++) {
             View v = list.get(i);
@@ -1088,9 +978,11 @@ public class Folder extends LinearLayout
 
     private void setupContentDimensions(int count) {
         ArrayList<View> list = getItemsInReadingOrder();
-
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        /*
         int countX = mContent.getCountX();
         int countY = mContent.getCountY();
+
         boolean done = false;
 
         while (!done) {
@@ -1111,50 +1003,30 @@ public class Folder extends LinearLayout
             }
             done = countX == oldCountX && countY == oldCountY;
         }
-        if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-            mContent.setGridSize(countX, countY);
-        }
+        */
+        int countX = 4;
+        int countY = 4;
+
+        //add
+        mContent.setGridSize(countX, countY);
         arrangeChildren(list);
     }
 
     public boolean isFull() {
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            return false;
-        }
         return getItemCount() >= mMaxNumItems;
-    }
-
-    public int getFolderFrameWidth() {
-        return mFolderFrame.getWidth();
-    }
-
-    public int getFolderFrameHeigth() {
-        return mFolderFrame.getHeight();
-    }
-
-    public LinearLayout getFolderFrameLayout() {
-        return mFolderFrame;
-    }
-
-    public void setFolderFrameBg(Drawable bg) {
-        mFolderFrame.setBackground(bg);
     }
 
     private void centerAboutIcon() {
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
-        LayoutParams linearLp = (LayoutParams) mFolderFrame.getLayoutParams();
+
         DragLayer parent = (DragLayer) mLauncher.findViewById(R.id.drag_layer);
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
         //int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
-        int width, height;
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-           /* width = mLauncher.getWindow().getDecorView().getWidth();
-            height = mLauncher.getWindow().getDecorView().getHeight();*/
-            width = parent.getWidth();
-            height = parent.getHeight();
-        } else {
-            width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
-            height = getFolderHeight();
-        }
+        int width = parent.getWidth();
+        //int height = getFolderHeight();
+        int height = parent.getHeight();
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+
         float scale = parent.getDescendantRectRelativeToSelf(mFolderIcon, mTempRect);
 
         LauncherAppState app = LauncherAppState.getInstance();
@@ -1164,12 +1036,6 @@ public class Folder extends LinearLayout
         int centerY = (int) (mTempRect.top + mTempRect.height() * scale / 2);
         int centeredLeft = centerX - width / 2;
         int centeredTop = centerY - height / 2;
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {//add by linmaoqing 2014-5-27
-            if (mLauncher.getWorkspace() == null) {
-                return;
-            }
-        }
-
         int currentPage = mLauncher.getWorkspace().getNextPage();
         // In case the workspace is scrolling, we need to use the final scroll to compute
         // the folders bounds.
@@ -1183,10 +1049,8 @@ public class Folder extends LinearLayout
         mLauncher.getWorkspace().resetFinalScrollForPageChange(currentPage);
 
         // We need to bound the folder to the currently visible CellLayoutChildren
-        int left = Math.min(Math.max(bounds.left, centeredLeft),
-                bounds.left + bounds.width() - width);
-        int top = Math.min(Math.max(bounds.top, centeredTop),
-                bounds.top + bounds.height() - height);
+        int left = Math.min(Math.max(bounds.left, centeredLeft), bounds.left + bounds.width() - width);
+        int top = Math.min(Math.max(bounds.top, centeredTop), bounds.top + bounds.height() - height);
         if (grid.isPhone() && (grid.availableWidthPx - width) < grid.iconSizePx) {
             // Center the folder if it is full (on phones only)
             left = (grid.availableWidthPx - width) / 2;
@@ -1202,32 +1066,19 @@ public class Folder extends LinearLayout
         int folderPivotY = height / 2 + (centeredTop - top);
         setPivotX(folderPivotX);
         setPivotY(folderPivotY);
-        mFolderIconPivotX = (int) (mFolderIcon.getMeasuredWidth() *
-                (1.0f * folderPivotX / width));
-        mFolderIconPivotY = (int) (mFolderIcon.getMeasuredHeight() *
-                (1.0f * folderPivotY / height));
+        mFolderIconPivotX = (int) (mFolderIcon.getMeasuredWidth() * (1.0f * folderPivotX / width));
+        mFolderIconPivotY = (int) (mFolderIcon.getMeasuredHeight() * (1.0f * folderPivotY / height));
+
         lp.width = width;
         lp.height = height;
-      /*  lp.x = 30;
-        lp.y = 150;*/
-
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            int frameWidth = mFolderFrame.getPaddingLeft() + mFolderFrame.getPaddingRight()
-                    + mContent.getDesiredWidth();
-            int frameHeigth = mFolderFrame.getPaddingTop() + mFolderFrame.getPaddingBottom()
-                    + mContent.getDesiredHeight() + mFolderNameHeight + mIndicatorHeight;
-            Rect frame = new Rect();
-            mLauncher.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-            mStatusBarHeigth = frame.top;
-            Display display = mLauncher.getWindowManager().getDefaultDisplay();
-            //linearLp.leftMargin = (display.getWidth() - frameWidth) / 2;
-            //linearLp.topMargin = (display.getHeight() - frameHeigth + mStatusBarHeigth) / 2;
-            lp.x = (display.getWidth() - frameWidth) / 2;
-            lp.y = (display.getHeight() - frameHeigth + mStatusBarHeigth) / 2;
-        } else {
-            lp.x = left;
-            lp.y = top;
-        }
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //lp.x = left;
+        //lp.y = top;
+        lp.x = 0;
+        lp.y = 0;
+      //  lp.
+      //  lp.gravity = Gravity.CENTER_VERTICAL;
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
     }
 
     float getPivotXForIconAnimation() {
@@ -1270,61 +1121,39 @@ public class Folder extends LinearLayout
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //add by linmaoqing 2014-5-13
-        int width, height;
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {  //add by linmaoqing 2014-5-13
-            width = mLauncher.getWindow().getDecorView().getWidth();
-            height = mLauncher.getWindow().getDecorView().getHeight();
-        } else {//end by linmaoqing 2014-5-13
-            width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
-            height = getFolderHeight();
+        int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
+        int height = getFolderHeight();
+        //Add DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        int mwidth = ((DragLayer) getParent()).getWidth();
+        int mheight = ((DragLayer) getParent()).getHeight();
+        //Add DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+        int contentAreaWidthSpec = MeasureSpec.makeMeasureSpec(getContentAreaWidth(), MeasureSpec.EXACTLY) + 28;
+        int contentAreaHeightSpec = MeasureSpec.makeMeasureSpec(getContentAreaHeight(), MeasureSpec.EXACTLY) + 45;
+
+        if (LauncherAppState.isDisableAllApps()) {
+            // Don't cap the height of the content to allow scrolling.
+            mContent.setFixedSize(getContentAreaWidth(), mContent.getDesiredHeight());
+        } else {
+            mContent.setFixedSize(getContentAreaWidth(), getContentAreaHeight());
         }
-        if (MuchConfig.SUPPORT_MUCH_STYLE) { //add by linmaoqing 2014-5-13
-            int frameWidth = mFolderFrame.getPaddingLeft() + mFolderFrame.getPaddingRight()
-                    + mContent.getDesiredWidth();
-            int frameHeigth = mFolderFrame.getPaddingTop() + mFolderFrame.getPaddingBottom() + mContent.getDesiredHeight()
-                    + mFolderNameHeight + mIndicatorHeight;
-            mFolderFrame.measure(MeasureSpec.makeMeasureSpec(frameWidth,
-                    MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(frameHeigth,
-                    MeasureSpec.EXACTLY));
-            int contentWidthSpec = MeasureSpec.makeMeasureSpec(mContent.getDesiredWidth(),
-                    MeasureSpec.EXACTLY);
-            int contentHeightSpec = MeasureSpec.makeMeasureSpec(mContent.getDesiredHeight(),
-                    MeasureSpec.EXACTLY);
-            mContent.measure(contentWidthSpec, contentHeightSpec);
-            mFolderName.measure(contentWidthSpec,
-                    MeasureSpec.makeMeasureSpec(mFolderNameHeight, MeasureSpec.EXACTLY));
-            mViewPageIndicator.measure(contentWidthSpec,
-                    MeasureSpec.makeMeasureSpec(mIndicatorHeight, MeasureSpec.EXACTLY));
-        } else { //end by linmaoqin
-            int contentAreaWidthSpec = MeasureSpec.makeMeasureSpec(mContent.getDesiredWidth(),
-                    MeasureSpec.EXACTLY);
-            int contentAreaHeightSpec = MeasureSpec.makeMeasureSpec(getContentAreaHeight(),
-                    MeasureSpec.EXACTLY);
-            mContent.setFixedSize(mContent.getDesiredWidth(), mContent.getDesiredHeight());
-            mScrollView.measure(contentAreaWidthSpec, contentAreaHeightSpec);  //modify by linmaoqing 2014-5-13
-            mFolderName.measure(contentAreaWidthSpec,
-                    MeasureSpec.makeMeasureSpec(mFolderNameHeight, MeasureSpec.EXACTLY));
-        }
-        setMeasuredDimension(width, height);
+
+        mScrollView.measure(contentAreaWidthSpec, contentAreaHeightSpec);
+        mFolderName.measure(contentAreaWidthSpec, MeasureSpec.makeMeasureSpec(mFolderNameHeight, MeasureSpec.EXACTLY));
+        //modify by luoran folder
+        //setMeasuredDimension(width, height);
+        setMeasuredDimension(mwidth, mheight);
     }
 
     private void arrangeChildren(ArrayList<View> list) {
         int[] vacant = new int[2];
-        if (MuchConfig.SUPPORT_MUCH_STYLE) { // add by linmaoqing 2014-5-13
-            list = getItemsInReadingOrderWithAbCoord();
-        } else { //end by linmaoqing
-            if (null == list) {
-                list = getItemsInReadingOrder();
-            }
+        if (list == null) {
+            list = getItemsInReadingOrder();
         }
         mContent.removeAllViews();
+
         for (int i = 0; i < list.size(); i++) {
             View v = list.get(i);
-            //modify by lilu 修复第二页图标不显示的问题
-//            mContent.getVacantCell(vacant, 1, 1);
-            mContent.getVacantCellAbCoord(vacant, 1, 1);
-            //end by lilu
+            mContent.getVacantCell(vacant, 1, 1);
             CellLayout.LayoutParams lp = (CellLayout.LayoutParams) v.getLayoutParams();
             lp.cellX = vacant[0];
             lp.cellY = vacant[1];
@@ -1332,10 +1161,7 @@ public class Folder extends LinearLayout
             if (info.cellX != vacant[0] || info.cellY != vacant[1]) {
                 info.cellX = vacant[0];
                 info.cellY = vacant[1];
-                if (info.getIntent().getComponent() != null) { //防止+号排序时插入数据库
-                    LauncherModel.addOrMoveItemInDatabase(mLauncher, info, mInfo.id, 0,
-                            info.cellX, info.cellY);
-                }
+                LauncherModel.addOrMoveItemInDatabase(mLauncher, info, mInfo.id, 0, info.cellX, info.cellY);
             }
             boolean insert = false;
             mContent.addViewToCellLayout(v, insert ? 0 : -1, (int) info.id, lp, true);
@@ -1343,27 +1169,7 @@ public class Folder extends LinearLayout
         mItemsInvalidated = true;
     }
 
-    // add by linmaoqing 2014-5-13
-    public ArrayList<View> getItemsInReadingOrderWithAbCoord() {
-        if (mItemsInvalidated) {
-            mItemsInReadingOrder.clear();
-            for (int j = 0; j < mContent.getCountY(); j++) {
-                for (int i = 0; i < mContent.getCountX(); i++) {
-                    View v = mContent.getChildAtByAbsoluteCoord(i, j);
-                    if (v != null) {
-                        mItemsInReadingOrder.add(v);
-                    }
-                }
-            }
-            mItemsInvalidated = false;
-        }
-        return mItemsInReadingOrder;
-    } // end by linmaoqing
-
     public int getItemCount() {
-        if (MuchConfig.SUPPORT_MUCH_STYLE) { //add by linmaoqing 2014-5-13
-            return mContent.getAllShortcutContainerChildCount();
-        } //end by linmaoqing
         return mContent.getShortcutsAndWidgets().getChildCount();
     }
 
@@ -1372,7 +1178,6 @@ public class Folder extends LinearLayout
     }
 
     private void onCloseComplete() {
-        Log.d("HAHA", "onCloseComplete");
         DragLayer parent = (DragLayer) getParent();
         if (parent != null) {
             parent.removeView(this);
@@ -1380,11 +1185,11 @@ public class Folder extends LinearLayout
         mDragController.removeDropTarget((DropTarget) this);
         clearFocus();
         mFolderIcon.requestFocus();
-        // Log.d("TEST", "getItemCount():" + getItemCount());
-        //  if (mRearrangeOnClose) {
-        setupContentForNumItems(getItemCount());
-        // mRearrangeOnClose = false;
-        //  }
+
+        if (mRearrangeOnClose) {
+            setupContentForNumItems(getItemCount());
+            mRearrangeOnClose = false;
+        }
         if (getItemCount() <= 1) {
             if (!mDragInProgress && !mSuppressFolderDeletion) {
                 replaceFolderWithFinalItem();
@@ -1392,11 +1197,6 @@ public class Folder extends LinearLayout
                 mDeleteFolderOnDropCompleted = true;
             }
         }
-        //关闭文件夹前检查空页并删除  add by linmaoqing 2014-5-13
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            mContent.checkAndRemoveEmptyPage();
-            mContent.setCurrentItem(0);
-        }//end by linmaoqing
         mSuppressFolderDeletion = false;
     }
 
@@ -1426,9 +1226,6 @@ public class Folder extends LinearLayout
                         mDragController.removeDropTarget((DropTarget) mFolderIcon);
                     }
                     mLauncher.removeFolder(mInfo);
-                    if (MuchConfig.SUPPORT_MUCH_STYLE) {//add by linmaoqing 2014-5-13
-                        mContent.removeAllViews();
-                    }//end by linmaoqing
                 }
                 // We add the child after removing the folder to prevent both from existing at
                 // the same time in the CellLayout. We need to add the new item with
@@ -1467,45 +1264,68 @@ public class Folder extends LinearLayout
     }
 
     public void onDrop(DragObject d) {
-        ShortcutInfo item;
-        if (d.dragInfo instanceof AppInfo) {
-            // Came from all apps -- make a copy
-            item = ((AppInfo) d.dragInfo).makeShortcut();
-            item.spanX = 1;
-            item.spanY = 1;
+        Runnable cleanUpRunnable = null;
+
+        // If we are coming from All Apps space, we defer removing the extra empty screen
+        // until the folder closes
+        if (d.dragSource != mLauncher.getWorkspace() && !(d.dragSource instanceof Folder)) {
+            cleanUpRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    mLauncher
+                            .exitSpringLoadedDragModeDelayed(true, Launcher.EXIT_SPRINGLOADED_MODE_SHORT_TIMEOUT, null);
+                }
+            };
+        }
+
+        View currentDragView;
+        ShortcutInfo si = mCurrentDragInfo;
+        if (mIsExternalDrag) {
+            si.cellX = mEmptyCell[0];
+            si.cellY = mEmptyCell[1];
+
+            // Actually move the item in the database if it was an external drag. Call this
+            // before creating the view, so that ShortcutInfo is updated appropriately.
+            LauncherModel.addOrMoveItemInDatabase(mLauncher, si, mInfo.id, 0, si.cellX, si.cellY);
+
+            // We only need to update the locations if it doesn't get handled in #onDropCompleted.
+            if (d.dragSource != this) {
+                updateItemLocationsInDatabaseBatch();
+            }
+            mIsExternalDrag = false;
+
+            currentDragView = createAndAddShortcut(si);
         } else {
-            item = (ShortcutInfo) d.dragInfo;
+            currentDragView = mCurrentDragView;
+            CellLayout.LayoutParams lp = (CellLayout.LayoutParams) currentDragView.getLayoutParams();
+            si.cellX = lp.cellX = mEmptyCell[0];
+            si.cellX = lp.cellY = mEmptyCell[1];
+            mContent.addViewToCellLayout(currentDragView, -1, (int) si.id, lp, true);
         }
-        // Dragged from self onto self, currently this is the only path possible, however
-        // we keep this as a distinct code path.
-        if (item == mCurrentDragInfo) {
-            ShortcutInfo si = (ShortcutInfo) mCurrentDragView.getTag();
-            CellLayout.LayoutParams lp = (CellLayout.LayoutParams) mCurrentDragView.getLayoutParams();
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                lp.cellX = mEmptyCell[0];
-                lp.cellY = mEmptyCell[1];
-                si.cellX = mEmptyCell[0];
-                si.cellY = mContent.getYIndexInAllPage(mEmptyCell[1]);
-            } else {
-                si.cellX = lp.cellX = mEmptyCell[0];
-                si.cellX = lp.cellY = mEmptyCell[1];
-            }
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                mContent.addViewToCurrentCellLayout(mCurrentDragView, -1, (int) item.id, lp, true);
-            } else {
-                mContent.addViewToCellLayout(mCurrentDragView, -1, (int) item.id, lp, true);
-            }
-            if (d.dragView.hasDrawn()) {
-                mLauncher.getDragLayer().animateViewIntoPosition(d.dragView, mCurrentDragView);
-            } else {
-                d.deferDragViewCleanupPostAnimation = false;
-                mCurrentDragView.setVisibility(VISIBLE);
-            }
-            mItemsInvalidated = true;
-            setupContentDimensions(getItemCount());
-            mSuppressOnAdd = true;
+
+        if (d.dragView.hasDrawn()) {
+
+            // Temporarily reset the scale such that the animation target gets calculated correctly.
+            float scaleX = getScaleX();
+            float scaleY = getScaleY();
+            setScaleX(1.0f);
+            setScaleY(1.0f);
+            mLauncher.getDragLayer().animateViewIntoPosition(d.dragView, currentDragView, cleanUpRunnable, null);
+            setScaleX(scaleX);
+            setScaleY(scaleY);
+        } else {
+            d.deferDragViewCleanupPostAnimation = false;
+            currentDragView.setVisibility(VISIBLE);
         }
-        mInfo.add(item);
+        mItemsInvalidated = true;
+        setupContentDimensions(getItemCount());
+
+        // Temporarily suppress the listener, as we did all the work already here.
+        mSuppressOnAdd = true;
+        mInfo.add(si);
+        mSuppressOnAdd = false;
+        // Clear the drag info, as it is no longer being dragged.
+        mCurrentDragInfo = null;
     }
 
     // This is used so the item doesn't immediately appear in the folder when added. In one case
@@ -1541,11 +1361,7 @@ public class Folder extends LinearLayout
         // the work associated with removing the item, so we don't have to do anything here.
         if (item == mCurrentDragInfo) return;
         View v = getViewForInfo(item);
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
-            mContent.removeIconView(v);
-        } else {
-            mContent.removeView(v);
-        }
+        mContent.removeView(v);
         if (mState == STATE_ANIMATING) {
             mRearrangeOnClose = true;
         } else {
@@ -1559,13 +1375,8 @@ public class Folder extends LinearLayout
     private View getViewForInfo(ShortcutInfo item) {
         for (int j = 0; j < mContent.getCountY(); j++) {
             for (int i = 0; i < mContent.getCountX(); i++) {
-                View v = null;
-                if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                    v = mContent.getChildAtByAbsoluteCoord(i, j);
-                } else {
-                    v = mContent.getChildAt(i, j);
-                }
-                if (v != null && v.getTag() == item) {// modify by linmaoqing 2014-5-13
+                View v = mContent.getChildAt(i, j);
+                if (v.getTag() == item) {
                     return v;
                 }
             }
@@ -1585,12 +1396,7 @@ public class Folder extends LinearLayout
             mItemsInReadingOrder.clear();
             for (int j = 0; j < mContent.getCountY(); j++) {
                 for (int i = 0; i < mContent.getCountX(); i++) {
-                    View v = null;
-                    if (MuchConfig.SUPPORT_MUCH_STYLE) {
-                        v = mContent.getChildAtByAbsoluteCoord(i, j);// add by linmaoqing 2014-5-13
-                    } else {
-                        v = mContent.getChildAt(i, j);
-                    }
+                    View v = mContent.getChildAt(i, j);
                     if (v != null) {
                         mItemsInReadingOrder.add(v);
                     }
@@ -1600,17 +1406,6 @@ public class Folder extends LinearLayout
         }
         return mItemsInReadingOrder;
     }
-
-    //add by linmaoqing 2014-5-13
-    private boolean isPointInFolderFrame(int x, int y) {
-        if (x < mFolderFrame.getLeft()
-                || x > mFolderFrame.getLeft() + mFolderFrame.getWidth()
-                || y < mFolderFrame.getTop()
-                || y > mFolderFrame.getTop() + mFolderFrame.getHeight()) {
-            return false;
-        }
-        return true;
-    }//end by linmaoqing
 
     public void getLocationInDragLayer(int[] loc) {
         mLauncher.getDragLayer().getLocationInDragLayer(this, loc);
@@ -1624,7 +1419,11 @@ public class Folder extends LinearLayout
 
     @Override
     public void getHitRectRelativeToDragLayer(Rect outRect) {
-        getHitRect(outRect);
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //getHitRect(outRect);
+        outRect.set(mScrollView.getLeft(), mScrollView.getTop(),
+                mScrollView.getRight(), mScrollView.getBottom());
+        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
     }
 
     // Compares item position based on rank and position giving priority to the rank.
