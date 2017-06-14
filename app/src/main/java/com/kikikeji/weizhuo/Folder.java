@@ -978,7 +978,7 @@ public class Folder extends LinearLayout
 
     private void setupContentDimensions(int count) {
         ArrayList<View> list = getItemsInReadingOrder();
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(start)
         /*
         int countX = mContent.getCountX();
         int countY = mContent.getCountY();
@@ -1020,12 +1020,12 @@ public class Folder extends LinearLayout
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
 
         DragLayer parent = (DragLayer) mLauncher.findViewById(R.id.drag_layer);
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(start)
         //int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
         int width = parent.getWidth();
         //int height = getFolderHeight();
         int height = parent.getHeight();
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(end)
 
         float scale = parent.getDescendantRectRelativeToSelf(mFolderIcon, mTempRect);
 
@@ -1071,14 +1071,14 @@ public class Folder extends LinearLayout
 
         lp.width = width;
         lp.height = height;
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(start)
         //lp.x = left;
         //lp.y = top;
         lp.x = 0;
         lp.y = 0;
       //  lp.
       //  lp.gravity = Gravity.CENTER_VERTICAL;
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(end)
     }
 
     float getPivotXForIconAnimation() {
@@ -1123,10 +1123,10 @@ public class Folder extends LinearLayout
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
         int height = getFolderHeight();
-        //Add DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //Add DELSLMY-1850 for folder open match screen by luoran(start)
         int mwidth = ((DragLayer) getParent()).getWidth();
         int mheight = ((DragLayer) getParent()).getHeight();
-        //Add DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+        //Add DELSLMY-1850 for folder open match screen by luoran(end)
         int contentAreaWidthSpec = MeasureSpec.makeMeasureSpec(getContentAreaWidth(), MeasureSpec.EXACTLY) + 28;
         int contentAreaHeightSpec = MeasureSpec.makeMeasureSpec(getContentAreaHeight(), MeasureSpec.EXACTLY) + 45;
 
@@ -1419,11 +1419,11 @@ public class Folder extends LinearLayout
 
     @Override
     public void getHitRectRelativeToDragLayer(Rect outRect) {
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(start)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(start)
         //getHitRect(outRect);
         outRect.set(mScrollView.getLeft(), mScrollView.getTop(),
                 mScrollView.getRight(), mScrollView.getBottom());
-        //Modify DELSLMY-1850 for folder open match screen by zhaopenglin(end)
+        //Modify DELSLMY-1850 for folder open match screen by luoran(end)
     }
 
     // Compares item position based on rank and position giving priority to the rank.

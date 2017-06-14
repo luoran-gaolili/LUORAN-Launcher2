@@ -122,7 +122,7 @@
     <declare-styleable name="InsettableFrameLayout_Layout">
         <attr name="layout_ignoreInsets" format="boolean" />
     </declare-styleable>
-    <!--add lallapp code by zhaopenglin 20170313  start-->
+    <!--add lallapp code by luoran 20170313  start-->
     <!-- AppsCustomizePagedView specific attributes.  These attributes are used to
          customize an AppsCustomizePagedView in xml files. -->
     <declare-styleable name="AppsCustomizePagedView">
@@ -139,5 +139,5 @@
         <!-- Number of widgets vertically -->
         <attr name="widgetCountY" format="integer" />
     </declare-styleable>
-    <!--add lallapp code by zhaopenglin 20170313 end-->
+    <!--add lallapp code by luoran 20170313 end-->
 </resources>

@@ -391,7 +391,7 @@ public class Workspace extends PagedView
         super(context, attrs, defStyle);
 
         mOutlineHelper = HolographicOutlineHelper.obtain(context);
-        setDataIsReady();//add lallapp code by zhaopenglin 20170313
+        setDataIsReady();//add lallapp code by luoran 20170313
         mLauncher = (Launcher) context;
         mStateTransitionAnimation = new WorkspaceStateTransitionAnimation(mLauncher, this);
         final Resources res = getResources();
@@ -717,7 +717,7 @@ public class Workspace extends PagedView
     }
 
     /**
-     * add by linmaoqing 2014-5-14 新增一个页面
+     * add by luoran  新增一个页面
      */
     protected void addScreen() {
         LayoutInflater layoutInflter = LayoutInflater.from(mLauncher);
@@ -774,7 +774,7 @@ public class Workspace extends PagedView
                 continue;
             }
             CellLayout cl = (CellLayout) child;
-            /*//modify by lilu 自定义页不需要画删除图标
+            /*//modify by luoran 自定义页不需要画删除图标
             CellLayout cl = (CellLayout) child;
             if (cl instanceof CustomPage) {
                 continue;
@@ -2042,7 +2042,7 @@ public class Workspace extends PagedView
         return listener;
     }
 
-    //add by linmaoqing 2014-5-23
+    //add by luoran 2014-5-23
     public void deleteNewEmptyScreen(View view) {
         if (view != null && view instanceof CellLayout) {
             CellLayout cl = (CellLayout) view;
@@ -4661,7 +4661,7 @@ public class Workspace extends PagedView
         }
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     @Override
     public void syncPages() {
 
@@ -4672,7 +4672,7 @@ public class Workspace extends PagedView
 
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
     public Bitmap createWidgetBitmap(ItemInfo widgetInfo, View layout) {
         int[] unScaledSize = mLauncher.getWorkspace().estimateItemSize(widgetInfo, false);
         int visibility = layout.getVisibility();

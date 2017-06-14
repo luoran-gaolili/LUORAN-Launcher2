@@ -159,11 +159,11 @@ public class LauncherStateTransitionAnimation {
                 }
             }
         };
-        //add lallapp code by zhaopenglin 20170313 start
+        //add lallapp code by luoran 20170313 start
         if (LauncherAppState.isLRAllApp()) {
             mCurrentAnimation = showAppsCustomizeHelper(animated, true, AppsCustomizePagedView.ContentType.Applications);
         } else {
-            //add lallapp code by zhaopenglin 20170313 end
+            //add lallapp code by luoran 20170313 end
             // Only animate the search bar if animating from spring loaded mode back to all apps
             mCurrentAnimation = startAnimationToOverlay(fromWorkspaceState,
                     Workspace.State.NORMAL_HIDDEN, buttonView, toView, animated, cb);
@@ -461,11 +461,11 @@ public class LauncherStateTransitionAnimation {
                 };
             }
         };
-        //add lallapp code by zhaopenglin 20170313 start
+        //add lallapp code by luoran 20170313 start
         if (LauncherAppState.isLRAllApp()) {
             mCurrentAnimation = hideAppsCustomizeHelper(toWorkspaceState, toWorkspacePage, animated, onCompleteRunnable);
         } else {
-            //add lallapp code by zhaopenglin 20170313 end
+            //add lallapp code by luoran 20170313 end
             // Only animate the search bar if animating to spring loaded mode from all apps
             mCurrentAnimation = startAnimationToWorkspaceFromOverlay(fromWorkspaceState, toWorkspaceState,
                     toWorkspacePage, mLauncher.getAllAppsButton(), appsView,
@@ -788,7 +788,7 @@ public class LauncherStateTransitionAnimation {
     void cleanupAnimation() {
         mCurrentAnimation = null;
     }
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     //=======================allapp=====================================
 
     /**
@@ -1305,5 +1305,5 @@ public class LauncherStateTransitionAnimation {
         }
     }
     //=======================allapp=====================================
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
 }

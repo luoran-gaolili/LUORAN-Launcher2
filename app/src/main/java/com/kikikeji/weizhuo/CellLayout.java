@@ -620,10 +620,10 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
                 canvas.restore();
             }
         }
-        //add by linmaoqing 2014-5-23
+        //add by luoran
         if (MuchConfig.SUPPORT_MUCH_STYLE) {
             mEmptyScreenHelper.drawDeleteIcon(canvas, getScrollX(), getScrollY());
-        }//end by linmaoqing
+        }//end by luoran
     }
 
     public void showFolderAccept(FolderRingAnimator fra) {

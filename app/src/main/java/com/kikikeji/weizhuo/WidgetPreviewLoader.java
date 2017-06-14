@@ -71,12 +71,12 @@ public class WidgetPreviewLoader {
     private final AppWidgetManagerCompat mWidgetManager;
     private final CacheDb mDb;
     private final int mProfileBadgeMargin;
-    //add lallapp code by zhaopenglin 20170313
+    //add lallapp code by luoran 20170313
     private final HashMap<String, WeakReference<Bitmap>> mLoadedPreviews = new HashMap<>();
     private int mPreviewBitmapWidth;
     private int mPreviewBitmapHeight;
     private PagedViewCellLayout mWidgetSpacingLayout;
-    //add lallapp code by zhaopenglin 20170313
+    //add lallapp code by luoran 20170313
     private final MainThreadExecutor mMainThreadExecutor = new MainThreadExecutor();
     @Thunk
     final Handler mWorkerHandler;
@@ -109,7 +109,7 @@ public class WidgetPreviewLoader {
         return new PreviewLoadRequest(task);
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     public void recycleBitmap(Object o, Bitmap bitmapToRecycle) {
         String name = getObjectName(o);
         synchronized (mLoadedPreviews) {
@@ -128,7 +128,7 @@ public class WidgetPreviewLoader {
             }
         }
     }
-//add lallapp code by zhaopenglin 20170313 end
+//add lallapp code by luoran 20170313 end
 
     /**
      * The DB holds the generated previews for various components. Previews can also have different
@@ -191,7 +191,7 @@ public class WidgetPreviewLoader {
         mDb.insertOrReplace(values);
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     private static final String WIDGET_PREFIX = "Widget:";
     private static final String SHORTCUT_PREFIX = "Shortcut:";
 
@@ -216,7 +216,7 @@ public class WidgetPreviewLoader {
         return output;
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
     public void removePackage(String packageName, UserHandleCompat user) {
         removePackage(packageName, user, mUserManager.getSerialNumberForUser(user));
     }
@@ -352,7 +352,7 @@ public class WidgetPreviewLoader {
         return null;
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     public int maxWidthForWidgetPreview(int spanX) {
         return Math.min(mPreviewBitmapWidth,
                 mWidgetSpacingLayout.estimateCellWidth(spanX));
@@ -363,7 +363,7 @@ public class WidgetPreviewLoader {
                 mWidgetSpacingLayout.estimateCellHeight(spanY));
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
     @Thunk
     Bitmap generatePreview(Launcher launcher, Object info, Bitmap recycle,
                            int previewWidth, int previewHeight) {

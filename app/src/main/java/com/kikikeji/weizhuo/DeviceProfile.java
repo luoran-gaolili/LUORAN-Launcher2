@@ -100,8 +100,8 @@ public class DeviceProfile {
     public final int allAppsIconSizePx;
     public final float allAppsIconTextSizeSp;
     // All apps
-    public int LRallAppsNumRows;//add lallapp code by zhaopenglin 20170313
-    public int LRallAppsNumCols;//add lallapp code by zhaopenglin 20170313
+    public int LRallAppsNumRows;//add lallapp code by luoran 20170313
+    public int LRallAppsNumCols;//add lallapp code by luoran 20170313
     // QSB
     private int searchBarWidgetInternalPaddingTop, searchBarWidgetInternalPaddingBottom;
     private int searchBarTopPaddingPx;
@@ -267,8 +267,8 @@ public class DeviceProfile {
         folderCellHeightPx = cellHeightPx + edgeMarginPx;
         folderBackgroundOffset = -edgeMarginPx;
         folderIconSizePx = iconSizePx + 2 * -folderBackgroundOffset;
-        LRallAppsNumCols = 4;//add lallapp code by zhaopenglin 20170313
-        LRallAppsNumRows = LRallAppsNumCols + 1;//add lallapp code by zhaopenglin 20170313
+        LRallAppsNumCols = 4;//add lallapp code by luoran 20170313
+        LRallAppsNumRows = LRallAppsNumCols + 1;//add lallapp code by luoran 20170313
     }
 
     /**
@@ -465,7 +465,7 @@ public class DeviceProfile {
 
     public void layout(Launcher launcher) {
         FrameLayout.LayoutParams lp;
-        Resources res = launcher.getResources();//add lallapp code by zhaopenglin 20170313
+        Resources res = launcher.getResources();//add lallapp code by luoran 20170313
         boolean hasVerticalBarLayout = isVerticalBarLayout();
         final boolean isLayoutRtl = Utilities.isRtl(launcher.getResources());
 
@@ -558,7 +558,7 @@ public class DeviceProfile {
                 pageIndicator.setLayoutParams(lp);
             }
         }
-        //add lallapp code by zhaopenglin 20170313
+        //add lallapp code by luoran 20170313
         // Layout AllApps
         AppsCustomizeTabHost host = (AppsCustomizeTabHost)
                 launcher.findViewById(R.id.apps_customize_pane);
@@ -620,7 +620,7 @@ public class DeviceProfile {
                 //padding.left:0, padding.top:0, padding.right:0, padding.bottom:11
             }
         }
-        //add lallapp code by zhaopenglin 20170313 end
+        //add lallapp code by luoran 20170313 end
         // Layout the Overview Mode
         ViewGroup overviewMode = launcher.getOverviewPanel();
         if (overviewMode != null) {

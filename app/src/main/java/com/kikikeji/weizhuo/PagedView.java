@@ -55,7 +55,7 @@ import com.kikikeji.weizhuo.util.Thunk;
 
 import java.util.ArrayList;
 
-//add lallapp code by zhaopenglin 20170313 start
+//add lallapp code by luoran 20170313 start
 interface Page {
     public int getPageChildCount();
 
@@ -67,7 +67,7 @@ interface Page {
 
     public int indexOfChildOnPage(View v);
 }
-//add lallapp code by zhaopenglin 20170313 end
+//add lallapp code by luoran 20170313 end
 
 /**
  * An abstraction of the original Workspace which supports browsing through a
@@ -110,7 +110,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     protected float mDensity;
     protected float mSmoothingTime;
     protected float mTouchX;
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     protected int mCellCountX = 0;
     protected int mCellCountY = 0;
     protected boolean mForceDrawAllChildrenNextFrame;
@@ -125,7 +125,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
 
     protected boolean mAllowLongPress = true;
     private boolean mAllowPagedViewAnimations = true;
-//add lallapp code by zhaopenglin 20170313 end
+//add lallapp code by luoran 20170313 end
 
     protected boolean mFirstLayout = true;
     private int mNormalChildHeight;
@@ -275,10 +275,10 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
      * Initializes various states for this workspace.
      */
     protected void init() {
-        //add lallapp code by zhaopenglin 20170313 start
+        //add lallapp code by luoran 20170313 start
         mDirtyPageContent = new ArrayList<Boolean>();
         mDirtyPageContent.ensureCapacity(32);
-        //add lallapp code by zhaopenglin 20170313 end
+        //add lallapp code by luoran 20170313 end
         mScroller = new LauncherScroller(getContext());
         setDefaultInterpolator(new ScrollInterpolator());
         mCurrentPage = 0;
@@ -460,7 +460,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     }
 
     /**
-     * //add lallapp code by zhaopenglin 20170313 start
+     * //add lallapp code by luoran 20170313 start
      * /**
      * Called by subclasses to mark that data is ready, and that we can begin loading and laying
      * out pages.
@@ -472,7 +472,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     protected boolean isDataReady() {
         return mIsDataReady;
     }
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
 
     /**
      * Updates the scroll of the current page immediately to its final scroll position.  We use this
@@ -902,7 +902,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         }
         setMeasuredDimension(scaledWidthSize, scaledHeightSize);
     }
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
 
     /**
      * This method should be called once before first layout / measure pass.
@@ -911,8 +911,8 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         mSpacePagesAutomatically = true;
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 end
+    //add lallapp code by luoran 20170313 start
     protected void enablePagedViewAnimations() {
         mAllowPagedViewAnimations = true;
 
@@ -922,7 +922,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         mAllowPagedViewAnimations = false;
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (getChildCount() == 0) {
@@ -1023,7 +1023,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         } else {
             updateMaxScrollX();
         }
-        //add begin by lilu 20140522
+        //add begin by luoran 20140522
         if (MuchConfig.SUPPORT_MUCH_STYLE && needUpdateFreeScrollBound) {
             updateFreescrollBounds();
         }
@@ -2470,7 +2470,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         return true;
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     protected void loadAssociatedPages(int page) {
         loadAssociatedPages(page, false);
     }
@@ -2593,5 +2593,5 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         }
     }
 
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
 }

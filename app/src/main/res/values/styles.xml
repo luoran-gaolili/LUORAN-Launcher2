@@ -104,7 +104,7 @@
         <item name="android:gravity">center</item>
         <item name="android:shadowRadius">10</item>
     </style>
-    <!--add lallapp code by zhaopenglin 20170313 start-->
+    <!--add lallapp code by luoran 20170313 start-->
     <style name="Icon.AppsCustomize">
         <item name="android:background">@null</item>
         <item name="android:textColor">@color/workspace_icon_text_color</item>
@@ -113,9 +113,9 @@
         <item name="android:shadowRadius">1</item>
         <item name="customShadows">true</item>
     </style>
-    <!--add lallapp code by zhaopenglin 20170313 end-->
+    <!--add lallapp code by luoran 20170313 end-->
 
-    <!--add lallapp code by zhaopenglin 20170313 start-->
+    <!--add lallapp code by luoran 20170313 start-->
     <style name="PagedViewWidgetImageView">
         <item name="android:paddingLeft">@dimen/app_widget_preview_padding_left</item>
     </style>
@@ -138,7 +138,7 @@
     <style name="TabIndicator.AppsCustomize">
         <!-- Overridden in values-land -->
     </style>
-    <!--add lallapp code by zhaopenglin 20170313 end-->
+    <!--add lallapp code by luoran 20170313 end-->
     <style name="WorkspaceIcon">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>

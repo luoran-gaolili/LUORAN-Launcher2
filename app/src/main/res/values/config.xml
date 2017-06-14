@@ -91,7 +91,7 @@
     <item name="action_move_screen_backwards" type="id" />
     <item name="action_move_screen_forwards" type="id" />
     <item name="action_resize" type="id" />
-    <!--add lallapp code by zhaopenglin 20170313 end-->
+    <!--add lallapp code by luoran 20170313 end-->
     <!-- Fade/zoom in/out duration & scale in the LAllApps transition.
          Note: This should be less than the workspaceShrinkTime as they happen together. -->
     <integer name="config_appsCustomizeRevealTime">220</integer>
@@ -104,8 +104,9 @@
 
     <integer name="config_appsCustomizeConcealTime">250</integer>
     <integer name="config_appsCustomizeItemsAlphaStagger">60</integer>
-    <!--add lallapp code by zhaopenglin 20170313 end-->
+    <!--add lallapp code by luoran 20170313 end-->
     <!-- The slope, in percent, of the drag movement needed to drag an item out of
         AppsCustomize (y / x * 100%)  -->
-    <integer name="config_appsCustomizeDragSlopeThreshold">150</integer><!--add lallapp code by zhaopenglin 20170313 -->
+    <integer name="config_appsCustomizeDragSlopeThreshold">150</integer><!--add lallapp code by luoran 20170313 -->
+    <bool name="is_rect_folder">true</bool>
 </resources>

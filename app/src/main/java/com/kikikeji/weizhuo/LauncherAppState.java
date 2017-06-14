@@ -199,7 +199,7 @@ public class LauncherAppState {
         return FeatureFlags.IS_ALPHA_BUILD || FeatureFlags.IS_DEV_BUILD;
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     public static boolean isLRAllApp() {
         return true;
 //        return false;
@@ -227,5 +227,5 @@ public class LauncherAppState {
     boolean shouldShowAppOrWidgetProvider(ComponentName componentName) {
         return mAppFilter == null || mAppFilter.shouldShowApp(componentName);
     }
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
 }

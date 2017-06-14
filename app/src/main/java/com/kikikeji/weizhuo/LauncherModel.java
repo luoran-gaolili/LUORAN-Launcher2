@@ -988,7 +988,7 @@ public class LauncherModel extends BroadcastReceiver
         }
     }
 
-    //add lallapp code by zhaopenglin 20170313 start
+    //add lallapp code by luoran 20170313 start
     public static final Comparator<AppInfo> getAppNameComparator() {
         final Collator collator = Collator.getInstance();
         return new Comparator<AppInfo>() {
@@ -1008,7 +1008,7 @@ public class LauncherModel extends BroadcastReceiver
             }
         };
     }
-    //add lallapp code by zhaopenglin 20170313 end
+    //add lallapp code by luoran 20170313 end
 
     /**
      * Returns true if the shortcuts already exists on the workspace. This must be called after
