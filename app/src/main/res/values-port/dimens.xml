@@ -17,7 +17,7 @@
 <resources>
 <!-- AppsCustomize -->
     <integer name="apps_customize_widget_cell_count_x">2</integer>
-    <integer name="apps_customize_widget_cell_count_y">2</integer>
+    <integer name="apps_customize_widget_cell_count_y">1</integer>
     <dimen name="wallpaperThumbnailWidth">97dp</dimen>
     <dimen name="wallpaperThumbnailHeight">160dp</dimen>
 </resources>
