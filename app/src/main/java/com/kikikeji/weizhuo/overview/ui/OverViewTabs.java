@@ -46,7 +46,7 @@ public class OverViewTabs implements InitPage {
     private MuchAppsCustomizeTabHost mAppsCustomizeTabHost;
     private MuchAppsCustomizePagedView mAppsCustomizeContent;
     private int mCurrIndex = 0;// 当前页卡编号
-    private static final int TITLE_COUNT = 3;
+    private static final int TITLE_COUNT = 4;
     private DragController mDragController;
     LayoutAnimationController mAnimController;
 

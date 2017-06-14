@@ -108,7 +108,7 @@
         <item>经典</item>
         <item>立方</item>
         <item>缩小</item>
-      <!--  <item>层叠</item>-->
+        <!--  <item>层叠</item>-->
         <item>旋转</item>
         <item>圆柱</item>
         <item>车轮翻转</item>
@@ -118,4 +118,5 @@
     <string name="wallpaper_select">壁纸</string>
     <string name="wallpaper_library">壁纸库</string>
     <string name="add_widget">小部件</string>
+    <string name="default_home_set_success">默认主屏已修改</string>
 </resources>

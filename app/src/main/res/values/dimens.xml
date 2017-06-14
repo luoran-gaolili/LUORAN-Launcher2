@@ -205,6 +205,11 @@
     <dimen name="much_workspace_indicator_item_padding">6dp</dimen>
     <dimen name="landscape_folder_item_drag_x_coordinate_offset">180dp</dimen>
     <dimen name="landscape_folder_item_drag_y_coordinate_offset">95dp</dimen>
-    <dimen name="portait_folder_item_drag_x_coordinate_offset">40dp</dimen>
-    <dimen name="portait_folder_item_drag_y_coordinate_offset">220dp</dimen>
+    <dimen name="portait_folder_item_drag_x_coordinate_offset">50dp</dimen>
+    <dimen name="portait_folder_item_drag_y_coordinate_offset">50dp</dimen>
+    <dimen name="workspace_page_add_w">25dp</dimen>
+    <dimen name="workspace_page_add_h">34dp</dimen>
+    <dimen name="workspace_page_home_w">14dp</dimen>
+    <dimen name="workspace_page_view_text_size">11sp</dimen>
+    <dimen name="workspace_widget_page_home_height">410dip</dimen>
 </resources>

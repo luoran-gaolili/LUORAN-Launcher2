@@ -66,6 +66,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal" />
 
+        <ImageView
+            android:id="@+id/qingcheng_widget_page"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:clickable="true"
+            android:visibility="gone"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="6dp"
+            android:src="@drawable/all_apps_button_icon"></ImageView>
+
         <include
             android:id="@+id/search_drop_target_bar"
             layout="@layout/search_drop_target_bar" />

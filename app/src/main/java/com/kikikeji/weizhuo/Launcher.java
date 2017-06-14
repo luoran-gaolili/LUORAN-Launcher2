@@ -168,7 +168,7 @@ public class Launcher extends Activity
      * request codes used internally.
      */
     protected static final int REQUEST_LAST = 100;
-
+    private LinearLayout mQingchengWidgetPageIndicators;
     static int SCREEN_COUNT = 5;
 
     // To turn on these properties, type
@@ -453,7 +453,7 @@ public class Launcher extends Activity
         }
 
         super.onCreate(savedInstanceState);
-
+        sharedPreferences = getSharedPreferences("RGKSLauncher", MODE_PRIVATE);
         LauncherAppState app = LauncherAppState.getInstance();
 
         // Load configuration-specific DeviceProfile
@@ -1423,7 +1423,8 @@ public class Launcher extends Activity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         mWorkspaceBackgroundDrawable = getResources().getDrawable(R.drawable.workspace_bg);
-
+        //  mQingchengWidgetPageIndicators = (LinearLayout)mDragLayer.findViewById(R.id.qingcheng_widget_page);
+        // mWorkspace.setQingchengWidgetPageIndicator(mQingchengWidgetPageIndicators);
         // Setup the drag layer
         mDragLayer.setup(this, dragController);
 
@@ -1432,7 +1433,7 @@ public class Launcher extends Activity
         if (mHotseat != null) {
             mHotseat.setOnLongClickListener(this);
         }
-
+//mWorkspace.showPageIndex(-1);
         // Setup the overview panel
         setupOverviewPanel();
 
@@ -1474,6 +1475,11 @@ public class Launcher extends Activity
         if (TestingUtils.MEMORY_DUMP_ENABLED) {
             TestingUtils.addWeightWatcher(this);
         }
+    }
+
+    public void mRefreshPageClick(boolean flag) {
+        mQingchengWidgetPageIndicators.setOnClickListener(flag ? this : null);
+        // mTopOverview.setOnClickListener(flag ?this: null);
     }
 
     private LinearLayout linearLayout;
@@ -1622,6 +1628,8 @@ public class Launcher extends Activity
      */
     private void completeAddShortcut(Intent data, long container, long screenId, int cellX,
                                      int cellY) {
+
+        // Log.d("GGG","completeAddShortcut");
         int[] cellXY = mTmpAddItemCellCoordinates;
         int[] touchXY = mPendingAddInfo.dropPos;
         CellLayout layout = getCellLayout(container, screenId);
@@ -2660,12 +2668,16 @@ public class Launcher extends Activity
         bindSearchProviderChanged();
     }
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
     /**
      * Launches the intent referred by the clicked shortcut.
      *
      * @param v The view representing the clicked shortcut.
      */
     public void onClick(View v) {
+        Log.d("sad", "onClick");
         // Make sure that rogue clicks don't get through while allapps is launching, or after the
         // view has detached (it's possible for this to happen if the view is removed mid touch).
         if (v.getWindowToken() == null) {
@@ -2700,11 +2712,35 @@ public class Launcher extends Activity
                 }
             }
             if (mWorkspace.isInOverviewMode()) {
-                showWorkspace(mWorkspace.indexOfChild(v), true);
+                //  showWorkspace(mWorkspace.indexOfChild(v), true);
+                /* CellLayout layout = (CellLayout) v;
+                layout.setBackground(getResources().getDrawable(R.drawable.default_ss));*/
+                int cellLayoutCount = mWorkspace.getChildCount();
+                CellLayout layout = (CellLayout) v;
+                int indexCurrent = mWorkspace.indexOfChild(layout);
+                int indexBefore = sharedPreferences.getInt("default_home_screen", 0);
+                if (indexBefore == indexCurrent) {
+                    //nothing
+
+                } else {
+                    for (int i = 0; i < cellLayoutCount - 1; i++) {
+                        editor = sharedPreferences.edit();
+                        editor.putInt("default_home_screen", indexCurrent);
+                        editor.commit();
+                        if (i == indexCurrent) {
+                            ((CellLayout) mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
+                        } else {
+                            ((CellLayout) mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+                        }
+                    }
+                    ToastUtils.makeText(Launcher.this, getResources().getString(R.string.default_home_set_success), Toast.LENGTH_SHORT).show();
+                }
+
             }
         }
 
         Object tag = v.getTag();
+        Log.d("GGGG", "tag:" + tag);
         if (tag instanceof ShortcutInfo) {
             onClickAppShortcut(v);
         } else if (tag instanceof FolderInfo) {
@@ -3362,7 +3398,7 @@ public class Launcher extends Activity
                 folder.getViewTreeObserver().removeOnPreDrawListener(this);
                 Context context = getApplicationContext();
                 ScreenCapture capture = new ScreenCapture(context);
-                Bitmap screenBmp = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_02);
+                Bitmap screenBmp = BitmapFactory.decodeResource(getResources(), R.drawable.background);
                /* if(screenBmp == null){
                     Log.d("LUORAN", "screenBmp = "+screenBmp);
                     screenBmp = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_02);
@@ -3576,7 +3612,11 @@ public class Launcher extends Activity
      * @return whether or not the Launcher state changed.
      */
     boolean showWorkspace(int snapToPage, boolean animated, Runnable onCompleteRunnable) {
-        // mWorkspace.deleteCreatorScreen(-401);
+        //  mWorkspace.deleteCreatorScreen(-401);
+        int cellLayoutCount = mWorkspace.getChildCount();
+        for (int i = 0; i < cellLayoutCount; i++) {
+            ((CellLayout) mWorkspace.getChildAt(i)).setBackgroundColor(Color.TRANSPARENT);
+        }
         boolean changed = mState != State.WORKSPACE ||
                 mWorkspace.getState() != Workspace.State.NORMAL;
         if (changed) {
@@ -3617,6 +3657,17 @@ public class Launcher extends Activity
      * onto one of the overview panel buttons.
      */
     void showOverviewMode(boolean animated, boolean requestButtonFocus) {
+        int defalutHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
+
+        int childCount = mWorkspace.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            if (i == defalutHomeScreen) {
+                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
+            } else {
+                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+            }
+
+        }
         Runnable postAnimRunnable = null;
         if (requestButtonFocus) {
             postAnimRunnable = new Runnable() {

@@ -251,9 +251,11 @@ public class DeviceProfile {
         final float scaleDps = res.getDimensionPixelSize(R.dimen.dragViewScale);
         dragViewScale = (iconSizePx + scaleDps) / iconSizePx;
 
-        // Hotseat
+        // Hotseat 修改此处可以调整Hotseat的高度
+        //  normalHotseatBarHeightPx = (int)((iconSizePx + 4 * edgeMarginPx)*1.5);
         normalHotseatBarHeightPx = iconSizePx + 4 * edgeMarginPx;
         shortHotseatBarHeightPx = iconSizePx + 2 * edgeMarginPx;
+        //hotseatCellHeightPx = normalHotseatBarHeightPx;
         hotseatCellWidthPx = iconSizePx;
         hotseatCellHeightPx = iconSizePx;
 
@@ -523,6 +525,7 @@ public class DeviceProfile {
             lp.gravity = Gravity.BOTTOM;
             lp.width = LayoutParams.MATCH_PARENT;
             lp.height = hotseatBarHeightPx;
+            // lp.topMargin += 20;
             hotseat.findViewById(R.id.layout).setPadding(
                     hotseatAdjustment + padding.left, 0,
                     hotseatAdjustment + padding.right, 2 * edgeMarginPx);
@@ -532,6 +535,7 @@ public class DeviceProfile {
             lp.gravity = Gravity.BOTTOM;
             lp.width = LayoutParams.MATCH_PARENT;
             lp.height = hotseatBarHeightPx;
+            // lp.topMargin += 20;
             hotseat.findViewById(R.id.layout).setPadding(
                     hotseatAdjustment + padding.left, 0,
                     hotseatAdjustment + padding.right, 0);

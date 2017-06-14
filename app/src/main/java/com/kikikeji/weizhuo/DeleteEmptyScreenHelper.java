@@ -44,12 +44,12 @@ public class DeleteEmptyScreenHelper {
         int drawableWidth = deleteIcon.getIntrinsicWidth();
         int drawableHeight = deleteIcon.getIntrinsicHeight();
         if (view instanceof CellLayout) {
-            left = view.getMeasuredWidth()-drawableWidth;
+            left = view.getMeasuredWidth() - drawableWidth;
             top = PADDING_OFFSET;
-        } 
-        
-        rect.set(left-PADDING_OFFSET, top, view.getMeasuredWidth()-PADDING_OFFSET, top + drawableHeight);
-        offRect.set(left-TOUCH_OFFSET, top-TOUCH_OFFSET, view.getMeasuredWidth()+TOUCH_OFFSET, top + drawableHeight+TOUCH_OFFSET);
+        }
+
+        rect.set(left - PADDING_OFFSET, top, view.getMeasuredWidth() - PADDING_OFFSET, top + drawableHeight);
+        offRect.set(left - TOUCH_OFFSET, top - TOUCH_OFFSET, view.getMeasuredWidth() + TOUCH_OFFSET, top + drawableHeight + TOUCH_OFFSET);
         deleteIcon.setBounds(rect);
         canvas.save();
         canvas.translate(scrollX, scrollY);
@@ -64,30 +64,30 @@ public class DeleteEmptyScreenHelper {
             return result;
         }
         switch (event.getAction()) {
-        case MotionEvent.ACTION_DOWN:
-            mIsTouchAlwaysInRect = isTouchInRect(event);
-            if (!mIsTouchAlwaysInRect) {
-                mLongPressHelper.postCheckForLongPress();
-            }
-            break;
-        case MotionEvent.ACTION_MOVE:
-            if (mIsTouchAlwaysInRect) {
+            case MotionEvent.ACTION_DOWN:
                 mIsTouchAlwaysInRect = isTouchInRect(event);
-            }
-            break;
-        case MotionEvent.ACTION_UP:
-            if (mIsTouchAlwaysInRect) {
-                mIsTouchAlwaysInRect = isTouchInRect(event);
-                if (mIsTouchAlwaysInRect) {
-                    deleteViewInScreen();
-                    return true;
+                if (!mIsTouchAlwaysInRect) {
+                    mLongPressHelper.postCheckForLongPress();
                 }
-            }
-            mLongPressHelper.cancelLongPress();
-            break;
-        default:
-            mLongPressHelper.cancelLongPress();
-            break;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mIsTouchAlwaysInRect) {
+                    mIsTouchAlwaysInRect = isTouchInRect(event);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (mIsTouchAlwaysInRect) {
+                    mIsTouchAlwaysInRect = isTouchInRect(event);
+                    if (mIsTouchAlwaysInRect) {
+                        deleteViewInScreen();
+                        return true;
+                    }
+                }
+                mLongPressHelper.cancelLongPress();
+                break;
+            default:
+                mLongPressHelper.cancelLongPress();
+                break;
         }
         return result;
     }
@@ -97,18 +97,18 @@ public class DeleteEmptyScreenHelper {
         int y;
         x = (int) event.getX();
         y = (int) event.getY();
-        return  offRect.contains(x, y);
+        return offRect.contains(x, y);
     }
 
     private void deleteViewInScreen() {
         if (null == mLauncher) {
             return;
         }
-        if(null == view){
+        if (null == view) {
             return;
         }
         ViewParent parent = view.getParent();
-        if(parent != null){
+        if (parent != null) {
             mLauncher.getWorkspace().deleteNewEmptyScreen(view);
             isClickDelete = true;
         }

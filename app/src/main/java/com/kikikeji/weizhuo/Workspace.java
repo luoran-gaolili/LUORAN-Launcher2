@@ -51,6 +51,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Choreographer;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -60,7 +61,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kikikeji.weizhuo.FolderIcon.FolderRingAnimator;
@@ -233,63 +236,6 @@ public class Workspace extends PagedView
         }
     }
 
-    // add luoran
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-//        dispatchDrawCycle(canvas);
-        if (MuchConfig.SUPPORT_MUCH_STYLE && !(mState == State.OVERVIEW)) {//modify by linmaoqing 2014-5-23
-            // 因父类PagedView屏蔽了首页和尾页显示（getVisiblePages()/screenScrolled()）,父类dispatchDraw()只画可见的child
-            boolean fastDraw = mTouchState != TOUCH_STATE_SCROLLING && mNextPage == INVALID_PAGE;
-            if (!fastDraw) {
-                long drawingTime = getDrawingTime();
-                int width = getViewportWidth();//每屏的宽度
-                float scrollPos = (float) getScrollX() / width;
-
-                int leftScreen;
-                int rightScreen;
-                boolean isScrollToRight = false;
-                int childCount = getChildCount();
-                if (childCount == 0) {//add by linmaoqing 2014-5-22
-                    return;
-                }
-                if (scrollPos < 0) {
-                    leftScreen = childCount - 1;
-                    rightScreen = 0;
-                } else {
-                    leftScreen = Math.min((int) scrollPos, childCount - 1);
-                    rightScreen = leftScreen + 1;
-                    rightScreen = rightScreen % childCount;
-                    isScrollToRight = true;
-                }
-                if (isScreenNoValid(leftScreen)) {
-                    if (rightScreen == 0 && !isScrollToRight) {
-                        int offset = childCount * width;
-                        canvas.translate(-offset, 0);
-                        drawChild(canvas, getChildAt(leftScreen), drawingTime);
-                        canvas.translate(+offset, 0);
-                    } else {
-                        drawChild(canvas, getChildAt(leftScreen), drawingTime);
-                    }
-                }
-                if (scrollPos != leftScreen && isScreenNoValid(rightScreen)) {
-                    if (rightScreen == 0 && isScrollToRight) {
-                        int offset = childCount * width;
-                        canvas.translate(+offset, 0);
-                        drawChild(canvas, getChildAt(rightScreen), drawingTime);
-                        canvas.translate(-offset, 0);
-                    } else {
-                        drawChild(canvas, getChildAt(rightScreen), drawingTime);
-                    }
-                }
-            } else {
-                View child = getChildAt(mCurrentPage);
-                if (child != null) {
-                    drawChild(canvas, child, getDrawingTime());
-                }
-            }
-        }
-    }
 
     private boolean isScreenNoValid(int screen) {
         return screen >= 0 && screen < getChildCount();
@@ -431,6 +377,9 @@ public class Workspace extends PagedView
         this(context, attrs, 0);
     }
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
     /**
      * Used to inflate the Workspace from XML.
      *
@@ -458,6 +407,9 @@ public class Workspace extends PagedView
         mOverviewModeShrinkFactor =
                 res.getInteger(R.integer.config_workspaceOverviewShrinkPercentage) / 100f;
         mOriginalDefaultPage = mDefaultPage = a.getInt(R.styleable.Workspace_defaultScreen, 1);
+        sharedPreferences = mLauncher.getSharedPreferences("RGKSLauncher", Context.MODE_PRIVATE);
+        int defaultHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
+        mOriginalDefaultPage = defaultHomeScreen;
         a.recycle();
 
         setOnHierarchyChangeListener(this);
@@ -703,6 +655,10 @@ public class Workspace extends PagedView
         if (delegate != null && delegate.isInAccessibleDrag()) {
             newScreen.enableAccessibleDrag(true, CellLayout.WORKSPACE_ACCESSIBILITY_DRAG);
         }
+        if (screenId != EXTRA_EMPTY_SCREEN_ID) {
+            Log.d("GGG", "screenId:" + screenId);
+            showPageIndex(-1);
+        }
         return screenId;
     }
 
@@ -721,6 +677,7 @@ public class Workspace extends PagedView
         newScreen.setOnLongClickListener(mLongClickListener);
         newScreen.setOnClickListener(mLauncher);
         newScreen.setSoundEffectsEnabled(false);
+        newScreen.setBackgroundResource(R.drawable.home_current);
         mWorkspaceScreens.put(newId, newScreen);
         mScreenOrder.add(insertIndex, newId);
         mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
@@ -832,6 +789,7 @@ public class Workspace extends PagedView
 
     public void deleteCreatorScreen(long screenId) {
         CellLayout cl = mWorkspaceScreens.get(EXTRA_ADD_SCREEN_ID);
+
         mWorkspaceScreens.remove(EXTRA_ADD_SCREEN_ID);
         mScreenOrder.remove(EXTRA_ADD_SCREEN_ID);
         removeView(cl);
@@ -994,9 +952,6 @@ public class Workspace extends PagedView
 
     public void removeExtraEmptyScreenDelayed(final boolean animate, final Runnable onComplete,
                                               final int delay, final boolean stripEmptyScreens) {
-        // Log.d("GLL666","removeExtraEmptyScreenDelayed");
-
-
         if (mLauncher.isWorkspaceLoading()) {
             // Don't strip empty screens if the workspace is still loading
             Launcher.addDumpLog(TAG, "    - workspace loading, skip", true);
@@ -1026,13 +981,17 @@ public class Workspace extends PagedView
                             onComplete, stripEmptyScreens);
                 }
             } else {
-                Log.d("GLL666", "2");
+                Log.d("GLL666", "2" + mState);
                 //允许保留空屏幕
                 //if (!MuchConfig.SUPPORT_MUCH_STYLE) {
+                if (mState == State.SPRING_LOADED) {
                     snapToPage(getNextPage(), 0);
                     fadeAndRemoveEmptyScreen(0, FADE_EMPTY_SCREEN_DURATION,
                             onComplete, stripEmptyScreens);
-            //    }
+                } else {
+                    //nothing
+                }
+                //    }
             }
             return;
         } else if (stripEmptyScreens) {
@@ -1069,7 +1028,9 @@ public class Workspace extends PagedView
                 }
             }
         };
-
+       /* if (qingcheng_widget_page_indicator.getVisibility() == View.VISIBLE || mState != State.NORMAL) {
+            //showWsLongPageView(getCurrentPage());
+        }*/
         ObjectAnimator oa = ObjectAnimator.ofPropertyValuesHolder(cl, alpha, bgAlpha);
         oa.setDuration(duration);
         oa.setStartDelay(delay);
@@ -1113,11 +1074,21 @@ public class Workspace extends PagedView
         if (getPageIndicator() != null) {
             getPageIndicator().updateMarker(index, getPageIndicatorMarker(index));
         }
-
+        //boolean flagShow = qingcheng_page_indicator.getVisibility() == View.VISIBLE;
+        if (mState != State.NORMAL) {
+            //showWsLongPageView(getCurrentPage());
+        }
         // Update the model for the new screen
         mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
 
         return newId;
+    }
+
+    public void hideWsLongPageView() {
+        mPageNum.clear();
+        qingcheng_widget_page_indicator.setVisibility(View.INVISIBLE);
+        // tmp.setVisibility(INVISIBLE);
+        mLauncher.mRefreshPageClick(false);
     }
 
     public CellLayout getScreenWithId(long screenId) {
@@ -1252,6 +1223,7 @@ public class Workspace extends PagedView
      */
     void addInScreen(View child, long container, long screenId, int x, int y, int spanX, int spanY,
                      boolean insert, boolean computeXYFromRank) {
+        //  Log.d("GGG","addInScreen");
         if (container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
             if (getScreenWithId(screenId) == null) {
                 Log.e(TAG, "Skipping child, screenId " + screenId + " not found");
@@ -2074,6 +2046,15 @@ public class Workspace extends PagedView
     public void deleteNewEmptyScreen(View view) {
         if (view != null && view instanceof CellLayout) {
             CellLayout cl = (CellLayout) view;
+            editor = sharedPreferences.edit();
+
+            int defaultHomeScreenId = sharedPreferences.getInt("default_home_screen", 0);
+            //  Log.d("GGGG", "indexOfChild(cl):" + indexOfChild(cl));
+            if (indexOfChild(cl) == defaultHomeScreenId) {
+                ((CellLayout) (getChildAt(indexOfChild(cl) - 1))).setBackgroundResource(R.drawable.home_default);
+                editor.putInt("default_home_screen", indexOfChild(cl) - 1);
+                editor.commit();
+            }
             long screenId = getIdForScreen(cl);
             mWorkspaceScreens.remove(screenId);
             mScreenOrder.remove(screenId);
@@ -3251,6 +3232,217 @@ public class Workspace extends PagedView
 
         // Recycle temporary bitmaps
         tmpB.recycle();
+    }
+
+    public void showPageIndex(int childCount) {
+        int allPage = childCount;
+
+        if (childCount == -1) {
+            allPage = getChildCount();
+        }
+
+        // showQingchengWorkSpacePage(qingcheng_page_indicator, allPage, mCurrentPage, true);
+        showQingchengWorkSpacePage(qingcheng_widget_page_indicator, allPage, mCurrentPage, false);
+    }
+
+    LinearLayout qingcheng_widget_page_indicator;
+    ArrayList<View> mPageViewWsList = new ArrayList<View>();
+    ArrayList<View> mPageViewLongList = new ArrayList<View>();
+    ImageView inactive;
+    ImageView active;
+    ViewGroup tmp;
+    int mCellPageDistance = 20;
+
+    public void setQingchengWidgetPageIndicator(LinearLayout arg) {
+
+        qingcheng_widget_page_indicator = arg;
+    }
+
+    public void showQingchengWorkSpacePage(View v, int allpage, int cur, boolean workspace) {
+        if (/*cur >= allpage ||*/ cur < 0 || v == null || cur > allpage || allpage < 0) {
+            return;
+        }
+        if (workspace) {
+            mPageViewWsList.clear();
+        } else {
+            mPageViewLongList.clear();
+        }
+        TextView active;
+        tmp = (ViewGroup) v;
+        tmp.removeAllViews();
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+        lp.gravity = Gravity.CENTER;
+        lp.width = (int) mLauncher.getResources().getDimension(R.dimen.workspace_page_add_w);
+        lp.height = (int) mLauncher.getResources().getDimension(R.dimen.workspace_page_add_h);
+
+        if (allpage >= 9) {
+            mCellPageDistance = 16;
+        }
+
+        lp.leftMargin = mCellPageDistance;
+        for (int i = 0; i < allpage; i++) {
+            FrameLayout m =
+                    (FrameLayout) LayoutInflater.from(mLauncher).inflate(R.layout.work_click_page_view, null, false);
+            active = (TextView) m.findViewById(R.id.active);
+            inactive = (ImageView) m.findViewById(R.id.inactive);
+            String date = " " + (i + 1) + "   ";
+            active.setText(/*date.substring(0, 3)*/"" + (i + 1));
+            active.setTextSize(20);
+//			m.setBackgroundResource(R.color.workspace_page_view_default_color);
+            m.setBackgroundResource(R.drawable.workspace_page_view_default_color);
+
+            m.setId(i);
+            /**
+             * current page
+             */
+            if (i == cur) {
+//				m.setBackgroundResource(R.color.workspace_page_view_current_color);
+                m.setBackgroundResource(R.drawable.workspace_page_view_current_color);
+            }
+
+            /***
+             * set homepage
+             */
+
+            active.setVisibility(View.VISIBLE);
+            inactive.setVisibility(View.INVISIBLE);
+            int mTmpDefaultPage = mDefaultPage;
+            if (mLauncher.hasCustomContentToLeft()) {
+                mTmpDefaultPage = mTmpDefaultPage - 1;
+            }
+
+            if (i == mTmpDefaultPage && !workspace) {
+                inactive.setVisibility(View.VISIBLE);
+                inactive.setImageResource(R.drawable.workspace_add_home);
+                active.setVisibility(View.INVISIBLE);
+            }
+
+            m.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    // TODO Auto-generated method stub
+                    setPageNumberToScreen(tmp, arg0, arg0.getId());
+                }
+            });
+
+            m.setOnLongClickListener(new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View arg0) {
+                    // TODO Auto-generated method stub
+                    setHomePage(tmp, arg0, arg0.getId());
+                    return true;
+                }
+            });
+
+            if (i == allpage - 1) {
+                lp.rightMargin = mCellPageDistance;
+            }
+
+            tmp.addView(m, i, lp);
+            if (workspace) {
+                mPageViewWsList.add(m);
+            } else {
+                mPageViewLongList.add(m);
+            }
+
+        }
+        tmp.setVisibility(View.INVISIBLE);
+
+    }
+
+    ArrayList<int[]> mPageNum = new ArrayList<int[]>();
+    int[] hw = new int[2];
+
+    public void showWsLongPageView(int index) {
+
+        if (mLauncher.hasCustomContentToLeft()) {
+            index = index - 1;
+        }
+
+        showWidgetViewPage(mPageViewLongList, index, true);
+        qingcheng_widget_page_indicator.setVisibility(View.VISIBLE);
+        // mLauncher.mRefreshPageClick(true);
+        mPageNum.clear();
+        for (int i = 0; i < mPageViewLongList.size(); i++) {
+            mPageNum.add(getXy(i, mPageViewLongList.get(i)));
+        }
+    }
+
+    public int[] getXy(int i, View child) {
+        int[] location = new int[2];
+        int[] location1 = new int[2];
+        child.getLocationInWindow(location);
+//		child.getLocationOnScreen(location1);
+        hw[0] = child.getWidth();
+        hw[1] = child.getHeight();
+//		Log.i(TAG," =getXy== 1: "+Arrays.toString(location)+" w: "+hw[0]+" h: "+hw[1]+" wW:"+getWidth()+" wH"+getHeight());
+
+        return location;
+    }
+
+    public void showWidgetViewPage(ArrayList<View> view, int index, boolean isLong) {
+
+
+        for (int i = 0; i < view.size(); i++) {
+            FrameLayout page = (FrameLayout) view.get(i);
+
+            TextView active = (TextView) page.findViewById(R.id.active);
+            inactive = (ImageView) page.findViewById(R.id.inactive);
+            String date = " " + (i + 1) + "   ";
+//			active.setText(date.substring(0, 3));
+            active.setText(/*date.substring(0, 3)*/"" + (i + 1));
+            active.setTextSize(20);
+//			page.setBackgroundResource(R.color.workspace_page_view_default_color);
+            page.setBackgroundResource(R.drawable.workspace_page_view_default_color);
+
+            if (i == index) {
+//				page.setBackgroundResource(R.color.workspace_page_view_current_color);
+                page.setBackgroundResource(R.drawable.workspace_page_view_current_color);
+            }
+            active.setVisibility(View.VISIBLE);
+            inactive.setVisibility(View.INVISIBLE);
+//			Log.i(TAG,"  ==showWidgetViewPage===== "+ mDefaultPage+" i:"+ i);
+            int mTmpDefaultPage = mDefaultPage;
+            if (mLauncher.hasCustomContentToLeft()) {
+                mTmpDefaultPage = mTmpDefaultPage - 1;
+            }
+            if (i == mTmpDefaultPage && isLong) {
+                inactive.setVisibility(View.VISIBLE);
+                inactive.setImageResource(R.drawable.workspace_add_home);
+                active.setVisibility(View.INVISIBLE);
+            }
+        }
+
+
+    }
+
+    public void setPageNumberToScreen(View parent, View child, int index) {
+        // showWidgetViewPage(mPageViewLongList,index, true);
+        if (mLauncher.hasCustomContentToLeft()) {
+            index = index + 1;
+        }
+        mLauncher.getWorkspace().snapToPage(index);
+    }
+
+    public void setHomePage(View parent, View child, int index) {
+//			moveToScreen(index, true);
+
+        mDefaultPage = index;
+        if (mLauncher.hasCustomContentToLeft()) {
+            mDefaultPage = index + 1;
+        }
+
+        index = getCurrentPage();
+        if (mLauncher.hasCustomContentToLeft()) {
+            index = index - 1;
+        }
+       /* showWidgetViewPage(mPageViewLongList, index ,true);
+        preferences = mLauncher.getSharedPreferences(QCPreference.PREFERENCE_NAME, Context.MODE_PRIVATE);
+        editor = preferences.edit();
+        editor.putInt(QCPreference.KEY_HOME_PAGE_NUMBER, mDefaultPage);
+        editor.commit();*/
     }
 
     public boolean transitionStateShouldAllowDrop() {
@@ -5205,6 +5397,7 @@ public class Workspace extends PagedView
             }
         }
     }
+
     public void setFinalScrollForPageChange(int pageIndex) {
         CellLayout cl = (CellLayout) getChildAt(pageIndex);
         if (cl != null) {
@@ -5226,6 +5419,7 @@ public class Workspace extends PagedView
             cl.setRotationY(mSavedRotationY);
         }
     }
+
     void updateShortcuts(ArrayList<ShortcutInfo> shortcuts) {
         final HashSet<ShortcutInfo> updates = new HashSet<ShortcutInfo>(shortcuts);
         mapOverItems(MAP_RECURSE, new ItemOperator() {
@@ -5322,6 +5516,8 @@ public class Workspace extends PagedView
     }
 
     void moveToDefaultScreen(boolean animate) {
+        //获取默认桌面
+        mDefaultPage = sharedPreferences.getInt("default_home_screen", 0);
         moveToScreen(mDefaultPage, animate);
     }
 

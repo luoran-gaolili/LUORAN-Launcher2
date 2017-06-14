@@ -24,6 +24,7 @@ import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
@@ -204,6 +205,7 @@ public class WorkspaceStateTransitionAnimation {
     float mCurrentScale;
     @Thunk
     float mNewScale;
+    float iconNewScale;
 
 
     @Thunk
@@ -290,7 +292,7 @@ public class WorkspaceStateTransitionAnimation {
     private void animateWorkspace(final TransitionStates states, int toPage, final boolean animated,
                                   final int duration, final HashMap<View, Integer> layerViews,
                                   final boolean accessibilityEnabled) {
-        //Log.d("LUORAN123","animateWorkspace");
+        Log.d("LUORAN123", "animateWorkspace");
         if (states.stateIsOverview) {
             mWorkspace.addOrDeleteEmptyLayout(Workspace.State.OVERVIEW);
         } else if (states.stateIsNormal) {
@@ -318,7 +320,7 @@ public class WorkspaceStateTransitionAnimation {
         final int customPageCount = mWorkspace.numCustomPages();
 
         mNewScale = 1.0f;
-
+        iconNewScale = 1.0f;
         if (states.oldStateIsOverview) {
             mWorkspace.disableFreeScroll();
         } else if (states.stateIsOverview) {
@@ -328,13 +330,16 @@ public class WorkspaceStateTransitionAnimation {
         if (!states.stateIsNormal) {
             if (states.stateIsSpringLoaded) {
                 mNewScale = mSpringLoadedShrinkFactor;
+                iconNewScale = mSpringLoadedShrinkFactor;
             } else if (states.stateIsOverview || states.stateIsOverviewHidden) {
                 mNewScale = 0.7f;
+                iconNewScale = 0.9f;
             }
         }
 
-       if (toPage == SCROLL_TO_CURRENT_PAGE) {
+        if (toPage == SCROLL_TO_CURRENT_PAGE) {
             toPage = mWorkspace.getPageNearestToCenterOfScreen();
+            //Log.d("GGG", "snapPage:" + toPage);
         }
         mWorkspace.snapToPage(toPage, duration, mZoomInInterpolator);
 
@@ -363,7 +368,16 @@ public class WorkspaceStateTransitionAnimation {
                     cl.setShortcutAndWidgetAlpha(initialAlpha);
                 }
             }
-
+            if (states.stateIsNormal || states.workspaceToAllApps || states.allAppsToWorkspace) {
+                // Log.d("LUORAN123","if");
+                // hideWSPageView();
+                // mWorkspace.hideWsLongPageView();
+            } else {
+                //    Log.d("LUORAN123","else");
+                //   hideWSPageView();
+                //  hideWsLongPageView();
+                //mWorkspace.showWsLongPageView(mWorkspace.getCurrentPage());
+            }
             mOldAlphas[i] = initialAlpha;
             mNewAlphas[i] = finalAlpha;
             if (animated) {
@@ -390,6 +404,40 @@ public class WorkspaceStateTransitionAnimation {
             for (int index = 0; index < childCount; index++) {
                 final int i = index;
                 final CellLayout cl = (CellLayout) mWorkspace.getChildAt(i);
+                if (states.workspaceToOverview || states.oldStateIsOverview) {
+                    int childCountOverview = cl.getChildCount();
+                    // Log.d("GLL", "animation:" + states.workspaceToOverview);
+                    for (int j = 0; j < childCountOverview; j++) {
+                        if (cl.getChildAt(j) instanceof ClickShadowView) {
+                            ClickShadowView shortcutAndWidgetContainer = (ClickShadowView) cl.getChildAt(j);
+                            LauncherViewPropertyAnimator scale1 = new LauncherViewPropertyAnimator(shortcutAndWidgetContainer);
+                            scale1.scaleX(iconNewScale)
+                                    .scaleY(iconNewScale)
+                                    .setDuration(duration)
+                                    .setInterpolator(mZoomInInterpolator);
+                            mStateAnimator.play(scale1);
+                        } else if (cl.getChildAt(j) instanceof ShortcutAndWidgetContainer) {
+                            ShortcutAndWidgetContainer shortcutAndWidgetContainer = (ShortcutAndWidgetContainer) cl.getChildAt(j);
+                            LauncherViewPropertyAnimator scale1 = new LauncherViewPropertyAnimator(shortcutAndWidgetContainer);
+                            scale1.scaleX(iconNewScale)
+                                    .scaleY(iconNewScale)
+                                    .setDuration(duration)
+                                    .setInterpolator(mZoomInInterpolator);
+                            mStateAnimator.play(scale1);
+                        }
+                    }
+                }
+/*
+
+                if (states.stateIsOverview) {
+                    //Log.d("LUORAN1234", "stateIsOverview");
+                    // cl.setPadding(30, 30, 30, 30);
+                } else if (states.stateIsNormal) {
+                    // Log.d("LUORAN1245", "oldStateIsOverview");
+                    // cl.setPadding(0, 0, 0, 0);
+                }   //OverView模式下，左上角，右上角，留有空间
+*/
+
                 float currentAlpha = cl.getShortcutsAndWidgets().getAlpha();
                 if (mOldAlphas[i] == 0 && mNewAlphas[i] == 0) {
                     cl.setBackgroundAlpha(mNewBackgroundAlphas[i]);

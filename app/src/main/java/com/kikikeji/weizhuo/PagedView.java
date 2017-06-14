@@ -2186,6 +2186,13 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         whichPage = validateNewPage(whichPage);
 
         mNextPage = whichPage;
+        View focusedChild = getFocusedChild();
+        if (focusedChild != null && whichPage != mCurrentPage &&
+                focusedChild == getPageAt(mCurrentPage)) {
+            focusedChild.clearFocus();
+        }
+
+        sendScrollAccessibilityEvent();
 
         pageBeginMoving();
         awakenScrollBars(duration);
@@ -2213,7 +2220,10 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         if (immediate) {
             computeScroll();
         }
+
+        // Defer loading associated pages until the scroll settles
         mDeferLoadAssociatedPagesUntilScrollCompletes = true;
+
         mForceScreenScrolled = true;
         invalidate();
     }

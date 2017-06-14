@@ -52,4 +52,5 @@
     <!--LUORAN-->
     <color name="focused_color_normal">#FFB300</color>
     <color name="widget_text_panel">#FF374248</color> <!--add lallapp code by zhaopenglin 20170313 -->
+    <color name="workspace_page_view_text_color">#FFFFFF</color>
 </resources>

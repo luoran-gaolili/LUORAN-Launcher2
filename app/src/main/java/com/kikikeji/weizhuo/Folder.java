@@ -682,6 +682,7 @@ public class Folder extends LinearLayout
     }
 
     public void animateClosed() {
+
         if (!(getParent() instanceof DragLayer)) return;
         PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 0);
         PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat("scaleX", 0.9f);
@@ -836,9 +837,11 @@ public class Folder extends LinearLayout
         int centerCoordinateOffset[] = new int[2];
         if (MuchConfig.SUPPORT_MUCH_STYLE) {
             if (LauncherAppState.isScreenLandscape(mLauncher)) {
+                Log.d("Drag","if");
                 centerCoordinateOffset[0] = getResources().getDimensionPixelOffset(R.dimen.landscape_folder_item_drag_x_coordinate_offset);
                 centerCoordinateOffset[1] = getResources().getDimensionPixelOffset(R.dimen.landscape_folder_item_drag_x_coordinate_offset);
             } else {
+                Log.d("Drag","else");
                 centerCoordinateOffset[0] = getResources().getDimensionPixelOffset(R.dimen.portait_folder_item_drag_x_coordinate_offset);
                 centerCoordinateOffset[1] = getResources().getDimensionPixelOffset(R.dimen.portait_folder_item_drag_y_coordinate_offset);
             }
@@ -930,6 +933,8 @@ public class Folder extends LinearLayout
     }
 
     public void onDragExit(DragObject d) {
+        //  Log.d("DRAG","onDragExit");
+        //  arrangeChildren(getItemsInReadingOrder());
         // Exiting folder; stop the auto scroller.
         if (!MuchConfig.SUPPORT_MUCH_STYLE) {
             mAutoScrollHelper.setEnabled(false); //  add by linmaoqing 2014-5-13
@@ -1137,17 +1142,19 @@ public class Folder extends LinearLayout
 
     private void centerAboutIcon() {
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
-        LayoutParams linearLp = (LayoutParams) mFolderFrame.getLayoutParams();//add by linmaoqing 2014-5-13
+        LayoutParams linearLp = (LayoutParams) mFolderFrame.getLayoutParams();
         DragLayer parent = (DragLayer) mLauncher.findViewById(R.id.drag_layer);
         //int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
         int width, height;
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {  //add by linmaoqing 2014-5-13
-            width = mLauncher.getWindow().getDecorView().getWidth();
-            height = mLauncher.getWindow().getDecorView().getHeight();
+        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+           /* width = mLauncher.getWindow().getDecorView().getWidth();
+            height = mLauncher.getWindow().getDecorView().getHeight();*/
+            width = parent.getWidth();
+            height = parent.getHeight();
         } else {
             width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
             height = getFolderHeight();
-        }//end by linmaoqing 2014-5-13
+        }
         float scale = parent.getDescendantRectRelativeToSelf(mFolderIcon, mTempRect);
 
         LauncherAppState app = LauncherAppState.getInstance();
@@ -1201,7 +1208,9 @@ public class Folder extends LinearLayout
                 (1.0f * folderPivotY / height));
         lp.width = width;
         lp.height = height;
-        //add by linmaoqing 2014-5-13
+      /*  lp.x = 30;
+        lp.y = 150;*/
+
         if (MuchConfig.SUPPORT_MUCH_STYLE) {
             int frameWidth = mFolderFrame.getPaddingLeft() + mFolderFrame.getPaddingRight()
                     + mContent.getDesiredWidth();
@@ -1211,14 +1220,14 @@ public class Folder extends LinearLayout
             mLauncher.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
             mStatusBarHeigth = frame.top;
             Display display = mLauncher.getWindowManager().getDefaultDisplay();
-            linearLp.leftMargin = (display.getWidth() - frameWidth) / 2;
-            linearLp.topMargin = (display.getHeight() - frameHeigth + mStatusBarHeigth) / 2;
-            lp.x = 0;
-            lp.y = 0;
+            //linearLp.leftMargin = (display.getWidth() - frameWidth) / 2;
+            //linearLp.topMargin = (display.getHeight() - frameHeigth + mStatusBarHeigth) / 2;
+            lp.x = (display.getWidth() - frameWidth) / 2;
+            lp.y = (display.getHeight() - frameHeigth + mStatusBarHeigth) / 2;
         } else {
             lp.x = left;
             lp.y = top;
-        }// end by linmaoqing 2014-5-13
+        }
     }
 
     float getPivotXForIconAnimation() {
@@ -1363,7 +1372,7 @@ public class Folder extends LinearLayout
     }
 
     private void onCloseComplete() {
-        Log.d("HAHA","onCloseComplete");
+        Log.d("HAHA", "onCloseComplete");
         DragLayer parent = (DragLayer) getParent();
         if (parent != null) {
             parent.removeView(this);
@@ -1371,10 +1380,10 @@ public class Folder extends LinearLayout
         mDragController.removeDropTarget((DropTarget) this);
         clearFocus();
         mFolderIcon.requestFocus();
-
+        // Log.d("TEST", "getItemCount():" + getItemCount());
         //  if (mRearrangeOnClose) {
         setupContentForNumItems(getItemCount());
-       // mRearrangeOnClose = false;
+        // mRearrangeOnClose = false;
         //  }
         if (getItemCount() <= 1) {
             if (!mDragInProgress && !mSuppressFolderDeletion) {
