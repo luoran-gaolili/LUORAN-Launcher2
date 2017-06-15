@@ -3624,17 +3624,7 @@ public class Launcher extends Activity
      * onto one of the overview panel buttons.
      */
     void showOverviewMode(boolean animated, boolean requestButtonFocus) {
-        int defalutHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
 
-        int childCount = mWorkspace.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            if (i == defalutHomeScreen) {
-                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
-            } else {
-                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
-            }
-
-        }
         Runnable postAnimRunnable = null;
         if (requestButtonFocus) {
             postAnimRunnable = new Runnable() {
@@ -3653,6 +3643,29 @@ public class Launcher extends Activity
                 WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE, animated,
                 postAnimRunnable);
         mState = State.WORKSPACE;
+
+        //延迟加载
+        final int defalutHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
+        final int childCount = mWorkspace.getChildCount();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < childCount; i++) {
+                    if (i == defalutHomeScreen) {
+                        (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
+                    } else {
+                        //页面添加界面不做处理
+                        if (!(mWorkspace.getChildAt(i) instanceof CellLayoutCreator)) {
+                            (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+                        } else {
+                            //nothing
+                        }
+                    }
+
+                }
+            }
+        }, 300);
+
     }
 
     /**
