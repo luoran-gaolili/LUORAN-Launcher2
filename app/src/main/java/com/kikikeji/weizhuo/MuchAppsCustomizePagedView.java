@@ -52,7 +52,7 @@ import android.widget.Toast;
 
 import com.kikikeji.weizhuo.compat.AppWidgetManagerCompat;
 import com.kikikeji.weizhuo.model.WidgetsModel;
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 import com.kikikeji.weizhuo.widget.PendingAddShortcutInfo;
 import com.kikikeji.weizhuo.widget.PendingAddWidgetInfo;
 
@@ -864,7 +864,7 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
 
     // luoran 拖动widget后刷新删除图标
     private void updateLayoutDeleteState(View target, boolean success) {
-        if (MuchConfig.SUPPORT_MUCH_STYLE && success) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE && success) {
             if (target instanceof Workspace) {
                 int currentScreen = mLauncher.getCurrentWorkspaceScreen();
                 Workspace workspace = (Workspace) target;

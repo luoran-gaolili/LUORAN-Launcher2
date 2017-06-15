@@ -11,7 +11,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -352,7 +352,7 @@ public class MuchFolderPageView extends ViewPager implements ICellLayout {
     }
 
     private boolean needInterupteInDistance(MotionEvent ev) {
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             float distanceX = (ev.getX() - mDownMotionX);
             float distanceY = (ev.getY() - mDownMotionY);
             final double xyDist = Math.sqrt(distanceX * distanceX + distanceY * distanceY);

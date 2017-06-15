@@ -103,7 +103,7 @@ import com.kikikeji.weizhuo.compat.LauncherAppsCompat;
 import com.kikikeji.weizhuo.compat.UserHandleCompat;
 import com.kikikeji.weizhuo.compat.UserManagerCompat;
 import com.kikikeji.weizhuo.model.WidgetsModel;
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 import com.kikikeji.weizhuo.overview.ui.OverViewTabs;
 import com.kikikeji.weizhuo.util.ComponentKey;
 import com.kikikeji.weizhuo.util.LongArrayMap;
@@ -2145,7 +2145,7 @@ public class Launcher extends Activity
         mHandler.removeMessages(ADVANCE_MSG);
         mHandler.removeMessages(0);
         mWorkspace.removeCallbacks(mBuildLayersRunnable);
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             //unRegisterHomeKeyReceiver();
             mOverviewTabs.onDestory();
             mOverviewTabs = null;
@@ -2692,7 +2692,7 @@ public class Launcher extends Activity
             return;
         }
         //LUORAN
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             if (v instanceof CellLayoutCreator) {
                 if (mWorkspace.isInOverviewMode()) {
                     mWorkspace.setAddCellLayoutFlag(true);
@@ -2702,7 +2702,7 @@ public class Launcher extends Activity
             }
         }
         if (v instanceof CellLayout) {
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {//add by luoran
+            if (RgkConfig.SUPPORT_MUCH_STYLE) {//add by luoran
                 CellLayout layout = (CellLayout) v;
                 if (mWorkspace.isInOverviewMode() && layout.getEmptyScreenHelper().isClickDelete()) {
                     return;
@@ -3822,7 +3822,7 @@ public class Launcher extends Activity
 
     public View getOrCreateQsbBar() {
         //LUORAN
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             return null;
         }
         if (launcherCallbacksProvidesSearch()) {

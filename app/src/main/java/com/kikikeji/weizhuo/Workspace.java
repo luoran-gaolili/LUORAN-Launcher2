@@ -77,7 +77,7 @@ import com.kikikeji.weizhuo.accessibility.OverviewScreenAccessibilityDelegate;
 import com.kikikeji.weizhuo.accessibility.WorkspaceAccessibilityHelper;
 import com.kikikeji.weizhuo.compat.AppWidgetManagerCompat;
 import com.kikikeji.weizhuo.compat.UserHandleCompat;
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 import com.kikikeji.weizhuo.util.LongArrayMap;
 import com.kikikeji.weizhuo.util.Thunk;
 import com.kikikeji.weizhuo.util.WallpaperUtils;
@@ -207,7 +207,7 @@ public class Workspace extends PagedView
     //预览动画
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (MuchConfig.SCREEN_EFFECT_PREFS.equals(key)) {
+        if (RgkConfig.SCREEN_EFFECT_PREFS.equals(key)) {
             if (getChildCount() <= 1) {
                 return;
             }
@@ -743,7 +743,7 @@ public class Workspace extends PagedView
 
     //LUORAN
     public void addOrDeleteEmptyLayout(final State state) {
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             setEmptyScreenDeleteIcon(state);
             // setDefaultHomeIcon(state);
             if (state == State.OVERVIEW && !mWorkspaceScreens.containsKey(EXTRA_ADD_SCREEN_ID)) {
@@ -975,7 +975,7 @@ public class Workspace extends PagedView
             if (getNextPage() == emptyIndex) {
 
                 //允许保留空屏幕
-                if (MuchConfig.SUPPORT_MUCH_STYLE) {
+                if (RgkConfig.SUPPORT_MUCH_STYLE) {
 
                     snapToPage(getNextPage() - 1, SNAP_OFF_EMPTY_SCREEN_DURATION);
                     fadeAndRemoveEmptyScreen(SNAP_OFF_EMPTY_SCREEN_DURATION, FADE_EMPTY_SCREEN_DURATION,
@@ -992,7 +992,7 @@ public class Workspace extends PagedView
                     }
                 }
             } else {
-                if (MuchConfig.SUPPORT_MUCH_STYLE) {
+                if (RgkConfig.SUPPORT_MUCH_STYLE) {
                     Log.d("GLL666", "2");
                     snapToPage(getNextPage(), 0);
                     fadeAndRemoveEmptyScreen(0, FADE_EMPTY_SCREEN_DURATION,
@@ -1144,7 +1144,7 @@ public class Workspace extends PagedView
         int total = mWorkspaceScreens.size();
         for (int i = 0; i < total; i++) {
             long id = mWorkspaceScreens.keyAt(i);
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {
+            if (RgkConfig.SUPPORT_MUCH_STYLE) {
                 break;
             }
             CellLayout cl = mWorkspaceScreens.valueAt(i);
@@ -1184,7 +1184,7 @@ public class Workspace extends PagedView
             }
         }
 
-        if (MuchConfig.SUPPORT_MUCH_STYLE || !removeScreens.isEmpty()) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE || !removeScreens.isEmpty()) {
             // Update the model if we have changed any screens
             mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
         }
@@ -2073,7 +2073,7 @@ public class Workspace extends PagedView
 
     public SharedPreferences getLauncherSP() {
         return getContext().getSharedPreferences(
-                MuchConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE);
+                RgkConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE);
     }
 
     public boolean isSmall() {
@@ -2096,7 +2096,7 @@ public class Workspace extends PagedView
         // TODO 修改 滑屏动画
         boolean isInOverscroll = true;
         // Apply transition effect and adjacent screen fade if enabled
-        int screenEffectNum = getLauncherSP().getInt(MuchConfig.SCREEN_EFFECT_PREFS, 0);
+        int screenEffectNum = getLauncherSP().getInt(RgkConfig.SCREEN_EFFECT_PREFS, 0);
 
         for (int i = 0; i < getChildCount(); i++) {
             View v = getPageAt(i);

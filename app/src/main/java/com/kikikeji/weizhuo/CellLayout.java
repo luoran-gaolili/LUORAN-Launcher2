@@ -51,7 +51,7 @@ import com.kikikeji.weizhuo.BubbleTextView.BubbleTextShadowHandler;
 import com.kikikeji.weizhuo.FolderIcon.FolderRingAnimator;
 import com.kikikeji.weizhuo.accessibility.DragAndDropAccessibilityDelegate;
 import com.kikikeji.weizhuo.accessibility.WorkspaceAccessibilityHelper;
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 import com.kikikeji.weizhuo.util.ParcelableSparseArray;
 import com.kikikeji.weizhuo.util.Thunk;
 
@@ -296,7 +296,7 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
         mTouchFeedbackView = new ClickShadowView(context);
         addView(mTouchFeedbackView);
         addView(mShortcutsAndWidgets);
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             mEmptyScreenHelper = new DeleteEmptyScreenHelper(this);
         }
     }
@@ -392,7 +392,7 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
         // the home screen mode, however, once in overview mode stylus button press should be
         // enabled to allow rearranging the different home screens. So check what mode
         // the workspace is in, and only perform stylus button presses while in overview mode.
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             if (mEmptyScreenHelper != null) {
                 //事件拦截机制
                 return mEmptyScreenHelper.onTouchEventDelete(handled, ev);
@@ -621,7 +621,7 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
             }
         }
         //add by luoran
-        if (MuchConfig.SUPPORT_MUCH_STYLE) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
             mEmptyScreenHelper.drawDeleteIcon(canvas, getScrollX(), getScrollY());
         }//end by luoran
     }

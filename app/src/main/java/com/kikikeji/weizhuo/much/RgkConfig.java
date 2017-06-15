@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 
 import com.kikikeji.weizhuo.LauncherAppState;
 
-public final class MuchConfig {
+public final class RgkConfig {
     public static final boolean SUPPORT_MUCH_STYLE = true;
     public static final int KEYCODE_BUTTON_L1 = 102;
     public static final int KEYCODE_BUTTON_R1 = 103;
@@ -26,20 +26,20 @@ public final class MuchConfig {
     public static final String MUCH_LAUNCH_ICON_KEY = "much_launcher_icon_sw_key";
     public static final String SCREEN_EFFECT_PREFS = "screenEffect";
     public static final String LAUNCHER_PREFS = "com.android.launcher3.prefs";
-    private static MuchConfig sInstatnce;
+    private static RgkConfig sInstatnce;
     private Context mContext;
 
     public static void init(Context context) {
         if (sInstatnce == null) {
-            synchronized (MuchConfig.class) {
+            synchronized (RgkConfig.class) {
                 if (sInstatnce == null) {
-                    sInstatnce = new MuchConfig(context.getApplicationContext());
+                    sInstatnce = new RgkConfig(context.getApplicationContext());
                 }
             }
         }
     }
 
-    public static MuchConfig getInstance() {
+    public static RgkConfig getInstance() {
         if(sInstatnce == null) {
             throw new IllegalAccessError("init first !!!");
         }
@@ -47,7 +47,7 @@ public final class MuchConfig {
         return sInstatnce;
     }
 
-    private MuchConfig(Context context) {
+    private RgkConfig(Context context) {
         mContext = context;
     }
 

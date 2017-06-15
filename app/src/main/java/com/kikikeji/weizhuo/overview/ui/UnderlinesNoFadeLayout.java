@@ -22,13 +22,13 @@ import android.widget.TextView;
 
 import com.kikikeji.weizhuo.LauncherAppState;
 import com.kikikeji.weizhuo.R;
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
 
+public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
 
     private PagerAdapter mAdapter;
     private ViewPager mPager;
@@ -281,13 +281,13 @@ public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
     }
 
     private int getEffectIndex() {
-        SharedPreferences preferences = mContext.getSharedPreferences(MuchConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE);
-        return preferences.getInt(MuchConfig.SCREEN_EFFECT_PREFS, 0);
+        SharedPreferences preferences = mContext.getSharedPreferences(RgkConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE);
+        return preferences.getInt(RgkConfig.SCREEN_EFFECT_PREFS, 0);
     }
 
     private void saveEffectIndex(int index) {
-        Editor editor = mContext.getSharedPreferences(MuchConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE).edit();
-        editor.putInt(MuchConfig.SCREEN_EFFECT_PREFS, index).commit();
+        Editor editor = mContext.getSharedPreferences(RgkConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE).edit();
+        editor.putInt(RgkConfig.SCREEN_EFFECT_PREFS, index).commit();
 
     }
 

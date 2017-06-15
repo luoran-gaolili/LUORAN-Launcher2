@@ -49,7 +49,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Interpolator;
 
-import com.kikikeji.weizhuo.much.MuchConfig;
+import com.kikikeji.weizhuo.much.RgkConfig;
 import com.kikikeji.weizhuo.util.LauncherEdgeEffect;
 import com.kikikeji.weizhuo.util.Thunk;
 
@@ -950,7 +950,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         int childLeft = offsetX + (lp.isFullScreenPage ? 0 : getPaddingLeft());
         if (mPageScrolls == null || childCount != mChildCountOnLastLayout) {
             mPageScrolls = new int[childCount];
-            if (MuchConfig.SUPPORT_MUCH_STYLE) {
+            if (RgkConfig.SUPPORT_MUCH_STYLE) {
                 needUpdateFreeScrollBound = true;
             }
         }
@@ -1024,7 +1024,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
             updateMaxScrollX();
         }
         //add begin by luoran 20140522
-        if (MuchConfig.SUPPORT_MUCH_STYLE && needUpdateFreeScrollBound) {
+        if (RgkConfig.SUPPORT_MUCH_STYLE && needUpdateFreeScrollBound) {
             updateFreescrollBounds();
         }
         if (mFirstLayout && mCurrentPage >= 0 && mCurrentPage < childCount) {
@@ -1773,6 +1773,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                         awakenScrollBars();
                     }
                 } else if (mTouchState == TOUCH_STATE_REORDERING) {
+
                     // Update the last motion position
                     mLastMotionX = ev.getX();
                     mLastMotionY = ev.getY();
@@ -1794,6 +1795,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
 
                     final int pageUnderPointIndex = getNearestHoverOverPageIndex();
                     if (pageUnderPointIndex > -1 && pageUnderPointIndex != indexOfChild(mDragView)) {
+                        //Log.d("GLL777","pageUnderPointIndex"+getChildAt(pageUnderPointIndex));
                         mTempVisiblePagesRange[0] = 0;
                         mTempVisiblePagesRange[1] = getPageCount() - 1;
                         getFreeScrollPageRange(mTempVisiblePagesRange);
@@ -1805,45 +1807,48 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                                 @Override
                                 public void run() {
                                     // Setup the scroll to the correct page before we swap the views
-                                    snapToPage(pageUnderPointIndex);
+                                    //添加界面不允许拖动
+                                    if (!(getChildAt(pageUnderPointIndex) instanceof CellLayoutCreator)) {
+                                        snapToPage(pageUnderPointIndex);
 
-                                    // For each of the pages between the paged view and the drag view,
-                                    // animate them from the previous position to the new position in
-                                    // the layout (as a result of the drag view moving in the layout)
-                                    int shiftDelta = (dragViewIndex < pageUnderPointIndex) ? -1 : 1;
-                                    int lowerIndex = (dragViewIndex < pageUnderPointIndex) ?
-                                            dragViewIndex + 1 : pageUnderPointIndex;
-                                    int upperIndex = (dragViewIndex > pageUnderPointIndex) ?
-                                            dragViewIndex - 1 : pageUnderPointIndex;
-                                    for (int i = lowerIndex; i <= upperIndex; ++i) {
-                                        View v = getChildAt(i);
-                                        // dragViewIndex < pageUnderPointIndex, so after we remove the
-                                        // drag view all subsequent views to pageUnderPointIndex will
-                                        // shift down.
-                                        int oldX = getViewportOffsetX() + getChildOffset(i);
-                                        int newX = getViewportOffsetX() + getChildOffset(i + shiftDelta);
+                                        // For each of the pages between the paged view and the drag view,
+                                        // animate them from the previous position to the new position in
+                                        // the layout (as a result of the drag view moving in the layout)
+                                        int shiftDelta = (dragViewIndex < pageUnderPointIndex) ? -1 : 1;
+                                        int lowerIndex = (dragViewIndex < pageUnderPointIndex) ?
+                                                dragViewIndex + 1 : pageUnderPointIndex;
+                                        int upperIndex = (dragViewIndex > pageUnderPointIndex) ?
+                                                dragViewIndex - 1 : pageUnderPointIndex;
+                                        for (int i = lowerIndex; i <= upperIndex; ++i) {
+                                            View v = getChildAt(i);
+                                            // dragViewIndex < pageUnderPointIndex, so after we remove the
+                                            // drag view all subsequent views to pageUnderPointIndex will
+                                            // shift down.
+                                            int oldX = getViewportOffsetX() + getChildOffset(i);
+                                            int newX = getViewportOffsetX() + getChildOffset(i + shiftDelta);
 
-                                        // Animate the view translation from its old position to its new
-                                        // position
-                                        AnimatorSet anim = (AnimatorSet) v.getTag(ANIM_TAG_KEY);
-                                        if (anim != null) {
-                                            anim.cancel();
+                                            // Animate the view translation from its old position to its new
+                                            // position
+                                            AnimatorSet anim = (AnimatorSet) v.getTag(ANIM_TAG_KEY);
+                                            if (anim != null) {
+                                                anim.cancel();
+                                            }
+
+                                            v.setTranslationX(oldX - newX);
+                                            anim = new AnimatorSet();
+                                            anim.setDuration(REORDERING_REORDER_REPOSITION_DURATION);
+                                            anim.playTogether(
+                                                    ObjectAnimator.ofFloat(v, "translationX", 0f));
+                                            anim.start();
+                                            v.setTag(anim);
                                         }
 
-                                        v.setTranslationX(oldX - newX);
-                                        anim = new AnimatorSet();
-                                        anim.setDuration(REORDERING_REORDER_REPOSITION_DURATION);
-                                        anim.playTogether(
-                                                ObjectAnimator.ofFloat(v, "translationX", 0f));
-                                        anim.start();
-                                        v.setTag(anim);
-                                    }
-
-                                    removeView(mDragView);
-                                    addView(mDragView, pageUnderPointIndex);
-                                    mSidePageHoverIndex = -1;
-                                    if (mPageIndicator != null) {
-                                        mPageIndicator.setActiveMarker(getNextPage());
+                                        removeView(mDragView);
+                                        addView(mDragView, pageUnderPointIndex);
+                                        mSidePageHoverIndex = -1;
+                                        if (mPageIndicator != null) {
+                                            mPageIndicator.setActiveMarker(getNextPage());
+                                        }
                                     }
                                 }
                             };
