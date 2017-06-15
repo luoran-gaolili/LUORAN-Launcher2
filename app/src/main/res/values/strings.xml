@@ -270,4 +270,34 @@
     <string name="widget_resized">Widget resized to width <xliff:g example="2" id="number">%1$s</xliff:g> height <xliff:g example="1" id="number">%2$s</xliff:g></string>
 
     <string name="default_home_set_success">Default home screen edited</string>
+    <string-array name="effect_names">
+        <item>Classic</item>
+        <item>Cube</item>
+        <item>ZoomIn</item>
+        <!--  <item>Stack</item>-->
+        <item>Rotate</item>
+        <item>Cylinder</item>
+        <item>Wheel</item>
+        <item>Fade</item>
+        <item>Accordion</item>
+    </string-array>
+    <string-array name="effect_icons">
+        <item>@drawable/effect_overview_simple_classic</item>
+        <item>@drawable/effect_overview_simple_cube_outside</item>
+        <item>@drawable/effect_overview_simple_flippy</item>
+        <!--<item>@drawable/effect_overview_simple_stack</item>-->
+        <item>@drawable/effect_overview_simple_collection</item>
+        <item>@drawable/effect_overview_cylinder</item>
+        <item>@drawable/effect_overview_simple_roll_away</item>
+        <item>@drawable/effect_overview_extrusion</item>
+        <item>@drawable/effect_overview_simple_accordion</item>
+    </string-array>
+
+    <string name="effect">Effect</string>
+    <string name="wallpaper_select">Wallpaper</string>
+    <string name="wallpaper_library">Wallpaper</string>
+    <string name="add_widget">Widget</string>
+
+    <string name="add_app">Add App</string>
+    <string name="add_app_count">Add App(%1$d)</string>
 </resources>

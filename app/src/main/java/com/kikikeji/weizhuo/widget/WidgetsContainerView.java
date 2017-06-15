@@ -21,7 +21,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView.State;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -30,7 +29,6 @@ import android.widget.Toast;
 import com.kikikeji.weizhuo.BaseContainerView;
 import com.kikikeji.weizhuo.CellLayout;
 import com.kikikeji.weizhuo.DeleteDropTarget;
-import com.kikikeji.weizhuo.DeviceProfile;
 import com.kikikeji.weizhuo.DragController;
 import com.kikikeji.weizhuo.DragSource;
 import com.kikikeji.weizhuo.DropTarget.DragObject;
@@ -41,6 +39,7 @@ import com.kikikeji.weizhuo.Launcher;
 import com.kikikeji.weizhuo.LauncherAppState;
 import com.kikikeji.weizhuo.PendingAddItemInfo;
 import com.kikikeji.weizhuo.R;
+import com.kikikeji.weizhuo.ToastUtils;
 import com.kikikeji.weizhuo.Utilities;
 import com.kikikeji.weizhuo.WidgetPreviewLoader;
 import com.kikikeji.weizhuo.Workspace;
@@ -56,7 +55,8 @@ public class WidgetsContainerView extends BaseContainerView
     private static final boolean LOGD = false;
 
     /* Global instances that are used inside this container. */
-    @Thunk Launcher mLauncher;
+    @Thunk
+    Launcher mLauncher;
     private DragController mDragController;
     private IconCache mIconCache;
 
@@ -124,7 +124,8 @@ public class WidgetsContainerView extends BaseContainerView
         CharSequence msg = Utilities.wrapForTts(
                 getContext().getText(R.string.long_press_widget_to_add),
                 getContext().getString(R.string.long_accessible_way_to_add));
-        mWidgetInstructionToast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+       // mWidgetInstructionToast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        mWidgetInstructionToast = ToastUtils.makeText(getContext(), msg, Toast.LENGTH_SHORT);
         mWidgetInstructionToast.show();
     }
 
@@ -273,7 +274,7 @@ public class WidgetsContainerView extends BaseContainerView
 
     @Override
     public void onDropCompleted(View target, DragObject d, boolean isFlingToDelete,
-            boolean success) {
+                                boolean success) {
         if (LOGD) {
             Log.d(TAG, "onDropCompleted");
         }

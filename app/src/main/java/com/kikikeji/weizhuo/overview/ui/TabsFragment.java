@@ -67,7 +67,7 @@ public class TabsFragment extends Fragment implements TabPageIndicator.OnTabRese
 
         @Override
         public Fragment getItem(int position) {
-            Log.d("lmq", "getItem position = " + position);
+            Log.d("luoran", "getItem position = " + position);
             return fragments.get(position);
         }
 
@@ -89,7 +89,7 @@ public class TabsFragment extends Fragment implements TabPageIndicator.OnTabRese
 
     @Override
     public void onTabReselected(int position) {
-        Log.d("lmq", "onTabReselected position = " + position);
+        Log.d("luoran", "onTabReselected position = " + position);
         Fragment fragment = mFragments.get(position);
 //        if (fragment != null && fragment instanceof UnderlinesNoFadeFragment) {
 ////            ((UnderlinesNoFadeFragment) fragment).setInitPage();

@@ -709,7 +709,7 @@ public class Workspace extends PagedView
     }
 
     public void deleteNewScreen(long screenId) {
-        Log.e("lmq", "deleteNewScreen  --screenId = " + screenId);
+        Log.e("luoran", "deleteNewScreen  --screenId = " + screenId);
         CellLayout cl = mWorkspaceScreens.get(EXTRA_ADD_SCREEN_ID);
         mWorkspaceScreens.remove(EXTRA_ADD_SCREEN_ID);
         mScreenOrder.remove(EXTRA_ADD_SCREEN_ID);
@@ -973,25 +973,32 @@ public class Workspace extends PagedView
             int emptyIndex = mScreenOrder.indexOf(EXTRA_EMPTY_SCREEN_ID);
             Log.d("GLL666", "emptyIndex:" + emptyIndex);
             if (getNextPage() == emptyIndex) {
-                Log.d("GLL666", "1");
+
                 //允许保留空屏幕
-                if (!MuchConfig.SUPPORT_MUCH_STYLE) {
+                if (MuchConfig.SUPPORT_MUCH_STYLE) {
+
                     snapToPage(getNextPage() - 1, SNAP_OFF_EMPTY_SCREEN_DURATION);
                     fadeAndRemoveEmptyScreen(SNAP_OFF_EMPTY_SCREEN_DURATION, FADE_EMPTY_SCREEN_DURATION,
                             onComplete, stripEmptyScreens);
+                    editor = sharedPreferences.edit();
+
+                    int defaultHomeScreenId = sharedPreferences.getInt("default_home_screen", 0);
+                    //  Log.d("GGGG", "indexOfChild(cl):" + indexOfChild(cl));
+                    if (getCurrentPage() == defaultHomeScreenId) {
+                        Log.d("GLL666", "14567489");
+                        //((CellLayout) (getChildAt(getCurrentPage() - 1))).setBackgroundResource(R.drawable.home_default);
+                        editor.putInt("default_home_screen", getCurrentPage() - 1);
+                        editor.commit();
+                    }
                 }
             } else {
-                Log.d("GLL666", "2" + mState);
-                //允许保留空屏幕
-                //if (!MuchConfig.SUPPORT_MUCH_STYLE) {
-                if (mState == State.SPRING_LOADED) {
+                if (MuchConfig.SUPPORT_MUCH_STYLE) {
+                    Log.d("GLL666", "2");
                     snapToPage(getNextPage(), 0);
                     fadeAndRemoveEmptyScreen(0, FADE_EMPTY_SCREEN_DURATION,
                             onComplete, stripEmptyScreens);
-                } else {
-                    //nothing
+
                 }
-                //    }
             }
             return;
         } else if (stripEmptyScreens) {
@@ -2293,7 +2300,7 @@ public class Workspace extends PagedView
         /**
          * 车轮翻转
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Rotate extends TransitionEffect {
             private boolean mUp;
@@ -2328,7 +2335,7 @@ public class Workspace extends PagedView
         /**
          * 立方
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Cube extends TransitionEffect {
             private boolean mIn;
@@ -2351,7 +2358,7 @@ public class Workspace extends PagedView
         /**
          * 层叠
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Stack extends TransitionEffect {
             private ZInterpolator mZInterpolator = new ZInterpolator(0.5f);
@@ -2412,7 +2419,7 @@ public class Workspace extends PagedView
         /**
          * 折叠，风琴效果
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Accordion extends TransitionEffect {
             public Accordion(Workspace workspace) {
@@ -2432,7 +2439,7 @@ public class Workspace extends PagedView
         /**
          * 翻转效果
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Flip extends TransitionEffect {
             public Flip(Workspace workspace) {
@@ -2460,7 +2467,7 @@ public class Workspace extends PagedView
         /**
          * 圆柱效果
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Cylinder extends TransitionEffect {
             private boolean mIn;
@@ -2483,7 +2490,7 @@ public class Workspace extends PagedView
         /**
          * 淡入淡出
          *
-         * @author lmq
+         * @author luoran
          */
         public static class Crossfade extends TransitionEffect {
             public Crossfade(Workspace workspace) {

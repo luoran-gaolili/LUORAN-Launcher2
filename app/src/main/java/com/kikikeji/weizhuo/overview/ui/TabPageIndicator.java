@@ -240,7 +240,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
 
     @Override
     public void setCurrentItem(int item) {
-    	Log.d("lmq", "tab setCurrentItem item = "+item);
+    	Log.d("luoran", "tab setCurrentItem item = "+item);
         if (mViewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
         }

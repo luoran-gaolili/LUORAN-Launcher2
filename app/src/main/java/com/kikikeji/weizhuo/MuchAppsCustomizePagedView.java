@@ -493,8 +493,9 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
         if (mWidgetInstructionToast != null) {
             mWidgetInstructionToast.cancel();
         }
-        mWidgetInstructionToast = Toast.makeText(getContext(), R.string.long_press_widget_to_add,
-                Toast.LENGTH_SHORT);
+        //mWidgetInstructionToast = Toast.makeText(getContext(), R.string.long_press_widget_to_add,
+        //        Toast.LENGTH_SHORT);
+        mWidgetInstructionToast = ToastUtils.makeText(getContext(), R.string.long_press_widget_to_add, Toast.LENGTH_SHORT);
         mWidgetInstructionToast.show();
 
         // Create a little animation to show that the widget can move

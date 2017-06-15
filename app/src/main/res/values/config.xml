@@ -107,6 +107,11 @@
     <!--add lallapp code by luoran 20170313 end-->
     <!-- The slope, in percent, of the drag movement needed to drag an item out of
         AppsCustomize (y / x * 100%)  -->
-    <integer name="config_appsCustomizeDragSlopeThreshold">150</integer><!--add lallapp code by luoran 20170313 -->
+    <integer name="config_appsCustomizeDragSlopeThreshold">150
+    </integer><!--add lallapp code by luoran 20170313 -->
     <bool name="is_rect_folder">true</bool>
+    <bool name="default_underline_indicator_fades">true</bool>
+    <integer name="default_underline_indicator_fade_delay">300</integer>
+    <integer name="default_underline_indicator_fade_length">400</integer>
+    <color name="default_underline_indicator_selected_color">#FF33B5E5</color>
 </resources>
