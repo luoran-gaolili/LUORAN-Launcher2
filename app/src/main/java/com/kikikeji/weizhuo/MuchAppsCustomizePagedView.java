@@ -439,7 +439,6 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
                     int minSpanY = Math.min(spanXY[1], minSpanXY[1]);
                     if (minSpanX <= (int) 5 &&
                             minSpanY <= (int) 6) {
-
                         mWidgets.add(widget);
                     } else {
                         Log.e(TAG, "Widget " + widget.provider + " can not fit on this device (" +

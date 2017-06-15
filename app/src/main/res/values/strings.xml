@@ -281,6 +281,7 @@
         <item>Fade</item>
         <item>Accordion</item>
     </string-array>
+
     <string-array name="effect_icons">
         <item>@drawable/effect_overview_simple_classic</item>
         <item>@drawable/effect_overview_simple_cube_outside</item>
