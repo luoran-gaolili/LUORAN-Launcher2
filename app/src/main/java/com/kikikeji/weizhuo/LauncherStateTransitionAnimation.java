@@ -31,8 +31,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 import com.kikikeji.weizhuo.allapps.AllAppsContainerView;
-import com.kikikeji.weizhuo.util.UiThreadCircularReveal;
 import com.kikikeji.weizhuo.util.Thunk;
+import com.kikikeji.weizhuo.util.UiThreadCircularReveal;
 import com.kikikeji.weizhuo.widget.WidgetsContainerView;
 
 import java.util.HashMap;
@@ -232,6 +232,7 @@ public class LauncherStateTransitionAnimation {
         // NOTE: this call apparently also sets the state for the workspace if !animated
         Animator workspaceAnim = mLauncher.startWorkspaceStateChangeAnimation(toWorkspaceState, -1,
                 animated, layerViews);
+        //Log.d("GLL555","1");
 
         // Animate the search bar
         startWorkspaceSearchBarAnimation(
@@ -493,6 +494,7 @@ public class LauncherStateTransitionAnimation {
                         };
                     }
                 };
+        // Log.d("GLL555666", "animated:" + animated);
         mCurrentAnimation = startAnimationToWorkspaceFromOverlay(
                 fromWorkspaceState, toWorkspaceState,
                 toWorkspacePage, mLauncher.getWidgetsButton(), widgetsView,
@@ -529,7 +531,7 @@ public class LauncherStateTransitionAnimation {
         // NOTE: this call apparently also sets the state for the workspace if !animated
         Animator workspaceAnim = mLauncher.startWorkspaceStateChangeAnimation(toWorkspaceState,
                 toWorkspacePage, animated, layerViews);
-
+        //Log.d("GLL555","2");
         // Animate the search bar
         startWorkspaceSearchBarAnimation(
                 toWorkspaceState, animated ? revealDuration : 0, animation);
@@ -848,7 +850,7 @@ public class LauncherStateTransitionAnimation {
         // NOTE: this call apparently also sets the state for the workspace if !animated
         Animator workspaceAnim = mLauncher.startWorkspaceStateChangeAnimation(toWorkspaceState, -1,
                 animated, layerViews);
-
+        Log.d("GLL555", "3");
         // Animate the search bar
         startWorkspaceSearchBarAnimation(
                 toWorkspaceState, animated ? revealDuration : 0, mStateAnimation);
@@ -1077,6 +1079,7 @@ public class LauncherStateTransitionAnimation {
         // NOTE: this call apparently also sets the state for the workspace if !animated
         Animator workspaceAnim = mLauncher.startWorkspaceStateChangeAnimation(toState,
                 toWorkspacePage, animated, layerViews);
+        //  Log.d("GLL555","4");
         // Animate the search bar
         startWorkspaceSearchBarAnimation(
                 toState, animated ? revealDuration : 0, mStateAnimation);

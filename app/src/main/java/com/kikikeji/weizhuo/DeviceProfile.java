@@ -634,7 +634,7 @@ public class DeviceProfile {
 
             // lp.width = Math.min(availableWidthPx, maxWidth);
             lp.width = availableWidthPx;
-            lp.height = DensityUtils.dip2px(launcher, 240);
+            lp.height = DensityUtils.dip2px(launcher, 230);
             overviewMode.setLayoutParams(lp);
 
             if (lp.width > totalItemWidth && visibleChildCount > 1) {

@@ -767,6 +767,7 @@ public class Launcher extends Activity
                 // we move to the closest one now to avoid visual jump.
                 mWorkspace.setCurrentPage(mWorkspace.getPageNearestToCenterOfScreen());
                 showWorkspace(false);
+                Log.d("GLLLR", "2");
             }
             return;
         }
@@ -1020,6 +1021,7 @@ public class Launcher extends Activity
 
         // Restore the previous launcher state
         if (mOnResumeState == State.WORKSPACE) {
+            Log.d("GLLLR", "1");
             showWorkspace(false);
         } else if (mOnResumeState == State.APPS) {
             boolean launchedFromApp = (mWaitingForResume != null);
@@ -1753,7 +1755,9 @@ public class Launcher extends Activity
                 // processing a multi-step drop
                 if (mAppsView != null && mWidgetsView != null &&
                         mPendingAddInfo.container == ItemInfo.NO_ID) {
-                    if (!showWorkspace(false)) {
+                    // Log.d("GLLLR","3");
+                    //false true 灭屏的时候执行动画，不然应用位置无法恢复
+                    if (!showWorkspace(true)) {
                         // If we are already on the workspace, then manually reset all apps
                         mAppsView.reset();
                     }
@@ -1787,6 +1791,7 @@ public class Launcher extends Activity
             filter.addAction(DebugIntents.DELETE_DATABASE);
             filter.addAction(DebugIntents.MIGRATE_DATABASE);
         }
+        //注册广播
         registerReceiver(mReceiver, filter);
         FirstFrameAnimatorHelper.initializeDrawListener(getWindow().getDecorView());
         mAttached = true;
@@ -3588,9 +3593,10 @@ public class Launcher extends Activity
                 mWorkspace.getState() != Workspace.State.NORMAL;
         if (changed) {
             mWorkspace.setVisibility(View.VISIBLE);
+
             mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                     Workspace.State.NORMAL, snapToPage, animated, onCompleteRunnable);
-
+//Log.d("GLLLR","1");
             // Set focus to the AppsCustomize button
             if (mAllAppsButton != null) {
                 mAllAppsButton.requestFocus();
@@ -3638,6 +3644,7 @@ public class Launcher extends Activity
             };
         }
         mWorkspace.setVisibility(View.VISIBLE);
+        //Log.d("GLLLR","2");
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.OVERVIEW,
                 WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE, animated,
@@ -3756,7 +3763,7 @@ public class Launcher extends Activity
                 mState == State.WIDGETS_SPRING_LOADED) {
             return;
         }
-
+        //Log.d("GLLLR","3");
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.SPRING_LOADED,
                 WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE, true /* animated */,

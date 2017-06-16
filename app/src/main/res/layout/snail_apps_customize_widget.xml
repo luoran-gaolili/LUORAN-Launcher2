@@ -80,9 +80,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp"
-        android:layout_marginTop="@dimen/snail_app_widget_preview_padding_top"
+
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="15dp">
         <!-- The name of the widget. -->
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/widget_name"
@@ -99,7 +99,7 @@
             android:singleLine="true"
             android:textAlignment="viewStart"
             android:textColor="#FFFFFFFF"
-            android:textSize="12sp" />
+            android:textSize="10sp" />
 
         <!-- The original dimensions of the widget (can't be the same text as above due to different
              style. -->
@@ -115,7 +115,7 @@
             android:shadowColor="#B0000000"
             android:shadowRadius="2.0"
             android:textColor="#FFFFFFFF"
-            android:textSize="12sp" />
+            android:textSize="10sp" />
     </LinearLayout>
 
 

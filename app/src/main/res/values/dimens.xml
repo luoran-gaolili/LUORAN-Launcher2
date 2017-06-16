@@ -194,7 +194,7 @@
     <!-- Padding applied to AppWidget previews -->
     <dimen name="app_widget_preview_padding_left">30dp</dimen>
     <dimen name="app_widget_preview_padding_right">16dp</dimen>
-    <dimen name="app_widget_preview_padding_top">25dp</dimen>
+    <dimen name="app_widget_preview_padding_top">15dp</dimen>
     <dimen name="app_widget_preview_label_vertical_padding">12dp</dimen>
     <dimen name="app_widget_preview_label_horizontal_padding">8dp</dimen>
     <!--add lallapp code by luoran 20170313 end-->

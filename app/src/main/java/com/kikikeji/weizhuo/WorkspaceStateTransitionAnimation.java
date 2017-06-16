@@ -35,6 +35,8 @@ import com.kikikeji.weizhuo.util.Thunk;
 
 import java.util.HashMap;
 
+
+
 /**
  * A convenience class to update a view's visibility state after an alpha animation.
  */
@@ -292,6 +294,7 @@ public class WorkspaceStateTransitionAnimation {
     private void animateWorkspace(final TransitionStates states, int toPage, final boolean animated,
                                   final int duration, final HashMap<View, Integer> layerViews,
                                   final boolean accessibilityEnabled) {
+
         Log.d("LUORAN123", "animateWorkspace");
         if (states.stateIsOverview) {
             mWorkspace.addOrDeleteEmptyLayout(Workspace.State.OVERVIEW);
@@ -314,7 +317,7 @@ public class WorkspaceStateTransitionAnimation {
                 1f : 0f;
         float finalOverviewPanelAlpha = states.stateIsOverview ? 1f : 0f;
         float finalWorkspaceTranslationY = states.stateIsOverview || states.stateIsOverviewHidden ?
-                -150.0f : 0;
+                mLauncher.getResources().getDimension(R.dimen.workspace_translationY) : 0;
 
         final int childCount = mWorkspace.getChildCount();
         final int customPageCount = mWorkspace.numCustomPages();
@@ -392,6 +395,7 @@ public class WorkspaceStateTransitionAnimation {
         final ViewGroup overviewPanel = mLauncher.getOverviewPanel();
         final View hotseat = mLauncher.getHotseat();
         final View pageIndicator = mWorkspace.getPageIndicator();
+        Log.d("GLL666", "animation:" + states.workspaceToOverview);
         if (animated) {
             LauncherViewPropertyAnimator scale = new LauncherViewPropertyAnimator(mWorkspace);
             scale.scaleX(mNewScale)
@@ -399,14 +403,15 @@ public class WorkspaceStateTransitionAnimation {
                     .translationY(finalWorkspaceTranslationY)
                     .setDuration(duration)
                     .setInterpolator(mZoomInInterpolator);
-            //Log.d("LUORAN111", "finalWorkspaceTranslationY:" + finalWorkspaceTranslationY);
+
+           // Log.d("LUORAN1112", "states:" + states.toString());
             mStateAnimator.play(scale);
             for (int index = 0; index < childCount; index++) {
                 final int i = index;
                 final CellLayout cl = (CellLayout) mWorkspace.getChildAt(i);
                 if (states.workspaceToOverview || states.oldStateIsOverview) {
                     int childCountOverview = cl.getChildCount();
-                    // Log.d("GLL", "animation:" + states.workspaceToOverview);
+                    // Log.d("GLL666", "animation:" + states.workspaceToOverview);
                     for (int j = 0; j < childCountOverview; j++) {
                         if (cl.getChildAt(j) instanceof ClickShadowView) {
                             ClickShadowView shortcutAndWidgetContainer = (ClickShadowView) cl.getChildAt(j);
