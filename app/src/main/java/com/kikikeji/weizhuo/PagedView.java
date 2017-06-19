@@ -717,11 +717,13 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                     Math.min(mNextPage, getChildCount() - (mEnablePageCycle ? 0 : 1)));
             mNextPage = INVALID_PAGE;
             notifyPageSwitchListener();
+            //modify by luoran for rgk launcher (start)
             if (mDeferLoadAssociatedPagesUntilScrollCompletes) {
                 // Log.d("LR666", "mCurrentPage:" + mCurrentPage);
                 loadAssociatedPages(mCurrentPage);
                 mDeferLoadAssociatedPagesUntilScrollCompletes = false;
             }
+            //modify by luoran for rgk launcher (start)
             // We don't want to trigger a page end moving unless the page has settled
             // and the user has stopped scrolling
             if (mTouchState == TOUCH_STATE_REST) {
@@ -950,9 +952,11 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         int childLeft = offsetX + (lp.isFullScreenPage ? 0 : getPaddingLeft());
         if (mPageScrolls == null || childCount != mChildCountOnLastLayout) {
             mPageScrolls = new int[childCount];
+            //modify by luoran for rgk launcher (start)
             if (RgkConfig.SUPPORT_MUCH_STYLE) {
                 needUpdateFreeScrollBound = true;
             }
+            //modify by luoran for rgk launcher (start)
         }
 
         for (int i = startIndex; i != endIndex; i += delta) {
@@ -1023,10 +1027,11 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         } else {
             updateMaxScrollX();
         }
-        //add begin by luoran 20140522
+        //modify by luoran for rgk launcher (start)
         if (RgkConfig.SUPPORT_MUCH_STYLE && needUpdateFreeScrollBound) {
             updateFreescrollBounds();
         }
+        //modify by luoran for rgk launcher (start)
         if (mFirstLayout && mCurrentPage >= 0 && mCurrentPage < childCount) {
             updateCurrentPageScroll();
             mFirstLayout = false;
@@ -1807,7 +1812,8 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                                 @Override
                                 public void run() {
                                     // Setup the scroll to the correct page before we swap the views
-                                    //添加界面不允许拖动
+                                    //modify by luoran for rgk launcher (start)
+                                    //Add interface does not allow drag
                                     if (!(getChildAt(pageUnderPointIndex) instanceof CellLayoutCreator)) {
                                         snapToPage(pageUnderPointIndex);
 
@@ -1850,6 +1856,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                                             mPageIndicator.setActiveMarker(getNextPage());
                                         }
                                     }
+                                    //modify by luoran for rgk launcher (end)
                                 }
                             };
                             postDelayed(mSidePageHoverRunnable, REORDERING_SIDE_PAGE_HOVER_TIMEOUT);
@@ -2475,7 +2482,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         return true;
     }
 
-    //add lallapp code by luoran 20170313 start
+    ////modify by luoran for rgk launcher (start)
     protected void loadAssociatedPages(int page) {
         loadAssociatedPages(page, false);
     }
@@ -2483,7 +2490,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     protected void loadAssociatedPages(int page, boolean immediateAndOnly) {
         if (mContentIsRefreshable) {
             final int count = getChildCount();
-            Log.d("LR666", "count:" + count);
+            //Log.d("LR666", "count:" + count);
             if (page < count) {
                 int lowerPageBound = getAssociatedLowerPageBound(page);
                 int upperPageBound = getAssociatedUpperPageBound(page);
@@ -2492,7 +2499,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                 // First, clear any pages that should no longer be loaded
                 for (int i = 0; i < count; ++i) {
                     //AppsCustomizeCellLayout appsCustomizeCellLayout = (AppsCustomizeCellLayout) getPageAt(i);
-                    Log.d("LR667", "mDirtyPageContent:" + mDirtyPageContent.size());
+                    //Log.d("LR667", "mDirtyPageContent:" + mDirtyPageContent.size());
                     if (!(getPageAt(i) instanceof Page)) {
                         continue;
                     }
@@ -2525,7 +2532,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
             }
         }
     }
-
+    //modify by luoran for rgk launcher (start)
     protected int getAssociatedLowerPageBound(int page) {
         return Math.max(0, page - 1);
     }

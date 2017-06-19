@@ -24,7 +24,6 @@ import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
@@ -295,7 +294,7 @@ public class WorkspaceStateTransitionAnimation {
                                   final int duration, final HashMap<View, Integer> layerViews,
                                   final boolean accessibilityEnabled) {
 
-        Log.d("LUORAN123", "animateWorkspace");
+       // Log.d("LUORAN123", "animateWorkspace");
         if (states.stateIsOverview) {
             mWorkspace.addOrDeleteEmptyLayout(Workspace.State.OVERVIEW);
         } else if (states.stateIsNormal) {
@@ -327,7 +326,9 @@ public class WorkspaceStateTransitionAnimation {
         if (states.oldStateIsOverview) {
             mWorkspace.disableFreeScroll();
         } else if (states.stateIsOverview) {
+            //modify by luoran for rgk launcher(start)
             // mWorkspace.enableFreeScroll();
+            //modify by luoran for rgk launcher(end)
         }
 
         if (!states.stateIsNormal) {
@@ -395,7 +396,7 @@ public class WorkspaceStateTransitionAnimation {
         final ViewGroup overviewPanel = mLauncher.getOverviewPanel();
         final View hotseat = mLauncher.getHotseat();
         final View pageIndicator = mWorkspace.getPageIndicator();
-        Log.d("GLL666", "animation:" + states.workspaceToOverview);
+        //Log.d("GLL666", "animation:" + states.workspaceToOverview);
         if (animated) {
             LauncherViewPropertyAnimator scale = new LauncherViewPropertyAnimator(mWorkspace);
             scale.scaleX(mNewScale)
@@ -409,6 +410,7 @@ public class WorkspaceStateTransitionAnimation {
             for (int index = 0; index < childCount; index++) {
                 final int i = index;
                 final CellLayout cl = (CellLayout) mWorkspace.getChildAt(i);
+                //add by luoran for rgk launcher(start)
                 if (states.workspaceToOverview || states.oldStateIsOverview) {
                     int childCountOverview = cl.getChildCount();
                     // Log.d("GLL666", "animation:" + states.workspaceToOverview);
@@ -432,17 +434,7 @@ public class WorkspaceStateTransitionAnimation {
                         }
                     }
                 }
-/*
-
-                if (states.stateIsOverview) {
-                    //Log.d("LUORAN1234", "stateIsOverview");
-                    // cl.setPadding(30, 30, 30, 30);
-                } else if (states.stateIsNormal) {
-                    // Log.d("LUORAN1245", "oldStateIsOverview");
-                    // cl.setPadding(0, 0, 0, 0);
-                }   //OverView模式下，左上角，右上角，留有空间
-*/
-
+                //modify by luoran for rgk launcher(end)
                 float currentAlpha = cl.getShortcutsAndWidgets().getAlpha();
                 if (mOldAlphas[i] == 0 && mNewAlphas[i] == 0) {
                     cl.setBackgroundAlpha(mNewBackgroundAlphas[i]);

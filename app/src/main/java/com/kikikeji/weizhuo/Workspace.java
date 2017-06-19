@@ -203,8 +203,8 @@ public class Workspace extends PagedView
     private float mOverviewModeShrinkFactor;
     private float mTempProgress;
     private int mMaxCount;
-
-    //预览动画
+    //add by luoran for rgk launcher(start)
+    //preview animation
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (RgkConfig.SCREEN_EFFECT_PREFS.equals(key)) {
@@ -235,7 +235,7 @@ public class Workspace extends PagedView
             }
         }
     }
-
+    //modify by luoran for rgk launcher(end)
 
     private boolean isScreenNoValid(int screen) {
         return screen >= 0 && screen < getChildCount();
@@ -407,8 +407,10 @@ public class Workspace extends PagedView
         mOverviewModeShrinkFactor =
                 res.getInteger(R.integer.config_workspaceOverviewShrinkPercentage) / 100f;
         mOriginalDefaultPage = mDefaultPage = a.getInt(R.styleable.Workspace_defaultScreen, 1);
+        //modify by luoran for rgk launcher(start)
         sharedPreferences = mLauncher.getSharedPreferences("RGKSLauncher", Context.MODE_PRIVATE);
         int defaultHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
+        //modify by luoran for rgk launcher(end)
         mOriginalDefaultPage = defaultHomeScreen;
         a.recycle();
 
@@ -691,7 +693,7 @@ public class Workspace extends PagedView
     }
 
 
-    // LUORAN
+    //modify by luoran for rgk launcher(start)
     public long addCreatorScreen() {
         if (mWorkspaceScreens.containsKey(EXTRA_ADD_SCREEN_ID)) {
             throw new RuntimeException("Screen id " + EXTRA_ADD_SCREEN_ID + " already exists!");
@@ -709,15 +711,14 @@ public class Workspace extends PagedView
     }
 
     public void deleteNewScreen(long screenId) {
-        Log.e("luoran", "deleteNewScreen  --screenId = " + screenId);
+       // Log.e("luoran", "deleteNewScreen  --screenId = " + screenId);
         CellLayout cl = mWorkspaceScreens.get(EXTRA_ADD_SCREEN_ID);
         mWorkspaceScreens.remove(EXTRA_ADD_SCREEN_ID);
         mScreenOrder.remove(EXTRA_ADD_SCREEN_ID);
         removeView(cl);
     }
-
     /**
-     * add by luoran  新增一个页面
+     * add by luoran  add  screen
      */
     protected void addScreen() {
         LayoutInflater layoutInflter = LayoutInflater.from(mLauncher);
@@ -730,7 +731,7 @@ public class Workspace extends PagedView
         }
         // invalidateCachedOffsets();
     }
-
+    //modify by luoran for rgk launcher(end)
     private boolean addCellLayoutFlag = false;
 
     public boolean isAddCellLayoutFlag() {
@@ -741,7 +742,7 @@ public class Workspace extends PagedView
         this.addCellLayoutFlag = addCellLayoutFlag;
     }
 
-    //LUORAN
+    //modify by luoran for rgk launcher(start)
     public void addOrDeleteEmptyLayout(final State state) {
         if (RgkConfig.SUPPORT_MUCH_STYLE) {
             setEmptyScreenDeleteIcon(state);
@@ -796,7 +797,7 @@ public class Workspace extends PagedView
         //setCurrentPage(getCurrentPage()+1);
         // invalidate();
     }
-
+    //modify by luoran for rgk launcher(end)
     public void createCustomContentContainer() {
         CellLayout customScreen = (CellLayout)
                 mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, this, false);
@@ -970,22 +971,20 @@ public class Workspace extends PagedView
 
         convertFinalScreenToEmptyScreenIfNecessary();
         if (hasExtraEmptyScreen()) {
+            //modify by luoran for rgk launcher(start)
             int emptyIndex = mScreenOrder.indexOf(EXTRA_EMPTY_SCREEN_ID);
-            Log.d("GLL666", "emptyIndex:" + emptyIndex);
+            //Log.d("GLL666", "emptyIndex:" + emptyIndex);
             if (getNextPage() == emptyIndex) {
-
                 //允许保留空屏幕
                 if (RgkConfig.SUPPORT_MUCH_STYLE) {
-
                     snapToPage(getNextPage() - 1, SNAP_OFF_EMPTY_SCREEN_DURATION);
                     fadeAndRemoveEmptyScreen(SNAP_OFF_EMPTY_SCREEN_DURATION, FADE_EMPTY_SCREEN_DURATION,
                             onComplete, stripEmptyScreens);
                     editor = sharedPreferences.edit();
-
                     int defaultHomeScreenId = sharedPreferences.getInt("default_home_screen", 0);
                     //  Log.d("GGGG", "indexOfChild(cl):" + indexOfChild(cl));
                     if (getCurrentPage() == defaultHomeScreenId) {
-                        Log.d("GLL666", "14567489");
+                        //Log.d("GLL666", "14567489");
                         //((CellLayout) (getChildAt(getCurrentPage() - 1))).setBackgroundResource(R.drawable.home_default);
                         editor.putInt("default_home_screen", getCurrentPage() - 1);
                         editor.commit();
@@ -993,7 +992,7 @@ public class Workspace extends PagedView
                 }
             } else {
                 if (RgkConfig.SUPPORT_MUCH_STYLE) {
-                    Log.d("GLL666", "2");
+                    //Log.d("GLL666", "2");
                     snapToPage(getNextPage(), 0);
                     fadeAndRemoveEmptyScreen(0, FADE_EMPTY_SCREEN_DURATION,
                             onComplete, stripEmptyScreens);
@@ -1001,8 +1000,9 @@ public class Workspace extends PagedView
                 }
             }
             return;
+            //modify by luoran for rgk launcher(end)
         } else if (stripEmptyScreens) {
-            Log.d("GLL666", "3");
+            //Log.d("GLL666", "3");
             // If we're not going to strip the empty screens after removing
             // the extra empty screen, do it right away.
             stripEmptyScreens();
@@ -1144,9 +1144,11 @@ public class Workspace extends PagedView
         int total = mWorkspaceScreens.size();
         for (int i = 0; i < total; i++) {
             long id = mWorkspaceScreens.keyAt(i);
+            //modify by luoran for rgk launcher(start)
             if (RgkConfig.SUPPORT_MUCH_STYLE) {
                 break;
             }
+            //modify by luoran for rgk launcher(end)
             CellLayout cl = mWorkspaceScreens.valueAt(i);
             if (id >= 0 && cl.getShortcutsAndWidgets().getChildCount() == 0) {
                 removeScreens.add(id);
@@ -1183,12 +1185,12 @@ public class Workspace extends PagedView
                 mScreenOrder.add(EXTRA_EMPTY_SCREEN_ID);
             }
         }
-
+        //modify by luoran for rgk launcher(start)
         if (RgkConfig.SUPPORT_MUCH_STYLE || !removeScreens.isEmpty()) {
             // Update the model if we have changed any screens
             mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
         }
-
+        //modify by luoran for rgk launcher(end)
         if (pageShift >= 0) {
             setCurrentPage(currentPage - pageShift);
         }
@@ -2049,7 +2051,7 @@ public class Workspace extends PagedView
         return listener;
     }
 
-    //add by luoran 2014-5-23
+    //add by luoran for rgk launcher(start)
     public void deleteNewEmptyScreen(View view) {
         if (view != null && view instanceof CellLayout) {
             CellLayout cl = (CellLayout) view;
@@ -2070,24 +2072,25 @@ public class Workspace extends PagedView
             mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
         }
     }
-
+    //modify by luoran for rgk launcher(end)
+    //modify by luoran for rgk launcher(start)
     public SharedPreferences getLauncherSP() {
         return getContext().getSharedPreferences(
                 RgkConfig.LAUNCHER_PREFS, Context.MODE_PRIVATE);
     }
-
+    //modify by luoran for rgk launcher(end)
+    //modify by luoran for rgk launcher(start)
     public boolean isSmall() {
-
         Log.d("LUORAN12345", "mState:" + mState);
         return mState == State.SPRING_LOADED || mState == State.OVERVIEW;
     }
-
+    //modify by luoran for rgk launcher(end)
     @Override
     protected void screenScrolled(int screenCenter) {
         updatePageAlphaValues(screenCenter);
         updateStateForCustomContent(screenCenter);
         enableHwLayersOnVisiblePages();
-
+        //modify by luoran for rgk launcher(start)
         if (isSmall() && !mShowEffectAnim) {
             initWorkspaceChild();
             return;
@@ -2133,9 +2136,9 @@ public class Workspace extends PagedView
                 }
             }
         }
-
+        //modify by luoran for rgk launcher(end)
     }
-
+    //add by luoran for rgk launcher(start)
     private void initWorkspaceChild() {
         for (int i = 0; i < getChildCount(); i++) {
             View v = getPageAt(i);
@@ -2526,7 +2529,7 @@ public class Workspace extends PagedView
             }
         }
     }
-
+    //modify by luoran for rgk launcher(end)
     public boolean isLayoutRtl() {
         return (getLayoutDirection() == LAYOUT_DIRECTION_RTL);
     }
@@ -2536,15 +2539,19 @@ public class Workspace extends PagedView
         mWindowToken = getWindowToken();
         computeScroll();
         mDragController.setWindowToken(mWindowToken);
-        //注册数据库监听
+        //modify by luoran for rgk launcher(start)
+        //register
         getLauncherSP().registerOnSharedPreferenceChangeListener(this);
+        //modify by luoran for rgk launcher(end)
     }
 
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mWindowToken = null;
-        //解绑数据库监听
+        //modify by luoran for rgk launcher(start)
+        //unregistar
         getLauncherSP().unregisterOnSharedPreferenceChangeListener(this);
+        //modify by luoran for rgk launcher(end)
     }
 
     protected void onResume() {
@@ -4583,20 +4590,22 @@ public class Workspace extends PagedView
             };
             boolean isWidget = pendingInfo.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET
                     || pendingInfo.itemType == LauncherSettings.Favorites.ITEM_TYPE_CUSTOM_APPWIDGET;
-            //LUORAN
+            //modify by luoran for rgk launcher(start)
             AppWidgetHostView finalView = isWidget ?
                     ((RgkPendingAddWidgetInfo) pendingInfo).boundWidget : null;
-
+            //modify by luoran for rgk launcher(end)
             if (finalView != null && updateWidgetSize) {
                 AppWidgetResizeFrame.updateWidgetSizeRanges(finalView, mLauncher, item.spanX,
                         item.spanY);
             }
 
             int animationStyle = ANIMATE_INTO_POSITION_AND_DISAPPEAR;
+            //modify by luoran for rgk launcher(start)
             if (isWidget && ((RgkPendingAddWidgetInfo) pendingInfo).info != null &&
                     ((RgkPendingAddWidgetInfo) pendingInfo).info.configure != null) {
                 animationStyle = ANIMATE_INTO_POSITION_AND_REMAIN;
             }
+            //modify by luoran for rgk launcher(end)
             animateWidgetDrop(info, cellLayout, d.dragView, onAnimationCompleteRunnable,
                     animationStyle, finalView, true);
         } else {

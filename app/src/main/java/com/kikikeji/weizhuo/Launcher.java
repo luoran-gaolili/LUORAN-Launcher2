@@ -2150,11 +2150,13 @@ public class Launcher extends Activity
         mHandler.removeMessages(ADVANCE_MSG);
         mHandler.removeMessages(0);
         mWorkspace.removeCallbacks(mBuildLayersRunnable);
+        //modify by luoran for rgk launcher(start)
         if (RgkConfig.SUPPORT_MUCH_STYLE) {
             //unRegisterHomeKeyReceiver();
             mOverviewTabs.onDestory();
             mOverviewTabs = null;
         }
+        //modify by luoran for rgk launcher(end)
         // Stop callbacks from LauncherModel
         LauncherAppState app = (LauncherAppState.getInstance());
 
@@ -2417,8 +2419,10 @@ public class Launcher extends Activity
                 int span[] = new int[2];
                 span[0] = spanX;
                 span[1] = spanY;
+                //modify by luoran for rgk launcher(start)
                 addAppWidgetFromDrop((RgkPendingAddWidgetInfo) info,
                         container, screenId, cell, span);
+                //modify by luoran for rgk launcher(end)
                 break;
             case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:
                 processShortcutFromDrop(info.componentName, container, screenId, cell);
@@ -2459,8 +2463,10 @@ public class Launcher extends Activity
      * @param screenId The ID of the screen where it should be added
      * @param cell     The cell it should be added to, optional
      */
+    //modify by luoran for rgk launcher(start)
     private void addAppWidgetFromDrop(RgkPendingAddWidgetInfo info, long container, long screenId,
                                       int[] cell, int[] span) {
+        //modify by luoran for rgk launcher(end)
         resetAddInfo();
         mPendingAddInfo.container = info.container = container;
         mPendingAddInfo.screenId = info.screenId = screenId;
@@ -2696,7 +2702,7 @@ public class Launcher extends Activity
             }
             return;
         }
-        //LUORAN
+        //modify by luoran for rgk launcher(start)
         if (RgkConfig.SUPPORT_MUCH_STYLE) {
             if (v instanceof CellLayoutCreator) {
                 if (mWorkspace.isInOverviewMode()) {
@@ -2706,6 +2712,7 @@ public class Launcher extends Activity
                 }
             }
         }
+        //modify by luoran for rgk launcher(end)
         if (v instanceof CellLayout) {
             if (RgkConfig.SUPPORT_MUCH_STYLE) {//add by luoran
                 CellLayout layout = (CellLayout) v;
@@ -2713,10 +2720,8 @@ public class Launcher extends Activity
                     return;
                 }
             }
+            //modify by luoran for rgk launcher(start)
             if (mWorkspace.isInOverviewMode()) {
-                //  showWorkspace(mWorkspace.indexOfChild(v), true);
-                /* CellLayout layout = (CellLayout) v;
-                layout.setBackground(getResources().getDrawable(R.drawable.default_ss));*/
                 int cellLayoutCount = mWorkspace.getChildCount();
                 CellLayout layout = (CellLayout) v;
                 int indexCurrent = mWorkspace.indexOfChild(layout);
@@ -2739,10 +2744,11 @@ public class Launcher extends Activity
                 }
 
             }
+            //modify by luoran for rgk launcher(end)
         }
 
         Object tag = v.getTag();
-        Log.d("GGGG", "tag:" + tag);
+       // Log.d("GGGG", "tag:" + tag);
         if (tag instanceof ShortcutInfo) {
             onClickAppShortcut(v);
         } else if (tag instanceof FolderInfo) {
@@ -3828,10 +3834,11 @@ public class Launcher extends Activity
     }
 
     public View getOrCreateQsbBar() {
-        //LUORAN
+        ////modify by luoran for rgk launcher(start)
         if (RgkConfig.SUPPORT_MUCH_STYLE) {
             return null;
         }
+        //modify by luoran for rgk launcher(end)
         if (launcherCallbacksProvidesSearch()) {
             return mLauncherCallbacks.getQsbBar();
         }
