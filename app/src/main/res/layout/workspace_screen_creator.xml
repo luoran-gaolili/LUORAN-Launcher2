@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.kikikeji.weizhuo.CellLayoutCreator
+<com.rgks.launcher3.CellLayoutCreator
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
 

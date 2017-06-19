@@ -24,7 +24,7 @@
         android:layout_width="fill_parent"
         android:layout_height="170dp" />
 
-    <com.kikikeji.weizhuo.overview.ui.UnderlinePageIndicator
+    <com.rgks.launcher3.overview.ui.UnderlinePageIndicator
 
         android:id="@+id/indicator"
         android:layout_width="100dp"

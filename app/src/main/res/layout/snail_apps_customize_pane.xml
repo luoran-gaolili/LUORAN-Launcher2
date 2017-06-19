@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.kikikeji.weizhuo.MuchAppsCustomizeTabHost
+<com.rgks.launcher3.MuchAppsCustomizeTabHost
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                     android:visibility="invisible"
                     android:clipToPadding="false" />
             </FrameLayout>
-            <com.kikikeji.weizhuo.MuchAppsCustomizePagedView
+            <com.rgks.launcher3.MuchAppsCustomizePagedView
                 android:id="@+id/apps_customize_pane_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -63,4 +63,4 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </LinearLayout>
-</com.kikikeji.weizhuo.MuchAppsCustomizeTabHost>
+</com.rgks.launcher3.MuchAppsCustomizeTabHost>

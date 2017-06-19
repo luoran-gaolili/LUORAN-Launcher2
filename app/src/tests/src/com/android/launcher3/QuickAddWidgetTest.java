@@ -1,4 +1,4 @@
-package com.kikikeji.weizhuo;
+package com.rgks.launcher3;
 
 import android.content.Intent;
 import android.graphics.Point;

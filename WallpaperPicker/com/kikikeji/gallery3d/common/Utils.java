@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kikikeji.gallery3d.common;
+package com.rgks.gallery3d.common;
 
 import android.database.Cursor;
 import android.graphics.RectF;

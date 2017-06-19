@@ -13,9 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.kikikeji.weizhuo.PageIndicator
+<com.rgks.launcher3.PageIndicator
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:animateLayoutChanges="true"
     launcher:windowSize="@integer/config_maxNumberOfPageIndicatorsToShow">
-</com.kikikeji.weizhuo.PageIndicator>
+</com.rgks.launcher3.PageIndicator>

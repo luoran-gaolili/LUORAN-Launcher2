@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kikikeji.gallery3d.common;
+package com.rgks.gallery3d.common;
 
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -33,7 +33,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.kikikeji.weizhuo.NycWallpaperUtils;
+import com.rgks.launcher3.NycWallpaperUtils;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

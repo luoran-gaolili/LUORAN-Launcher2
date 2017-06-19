@@ -5,7 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
-        applicationId "com.kikikeji.weizhuo"
+        applicationId "com.rgks.launcher3"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1

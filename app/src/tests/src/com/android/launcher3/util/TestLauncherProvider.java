@@ -1,9 +1,9 @@
-package com.kikikeji.weizhuo.util;
+package com.rgks.launcher3.util;
 
 import android.content.Context;
 
-import com.kikikeji.weizhuo.LauncherAppState;
-import com.kikikeji.weizhuo.LauncherProvider;
+import com.rgks.launcher3.LauncherAppState;
+import com.rgks.launcher3.LauncherProvider;
 
 /**
  * An extension of LauncherProvider backed up by in-memory database.
