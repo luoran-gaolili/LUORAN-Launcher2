@@ -336,7 +336,7 @@ public class WorkspaceStateTransitionAnimation {
                 mNewScale = mSpringLoadedShrinkFactor;
                 iconNewScale = mSpringLoadedShrinkFactor;
             } else if (states.stateIsOverview || states.stateIsOverviewHidden) {
-                mNewScale = 0.8f;
+                mNewScale = 0.75f;
                 iconNewScale = 0.9f;
             }
         }

@@ -330,7 +330,7 @@ public final class Utilities {
             icon.setBounds(sOldBounds);
             canvas.setBitmap(null);
 
-            return addBorderToImage(bitmap, iconBitmapSize);
+            return bitmap;
 
         }
     }

@@ -213,7 +213,7 @@
     <dimen name="workspace_page_view_text_size">11sp</dimen>
     <dimen name="workspace_widget_page_home_height">410dip</dimen>
     <dimen name="folder_available_icon_space">47dp</dimen>
-    <dimen name="folder_available_icon_height">20dp</dimen>
+    <dimen name="folder_available_icon_height">15dp</dimen>
     <dimen name="much_overmode_function_Layout_height">260dp</dimen>
     <dimen name="much_overmode_function_nav_height">35dp</dimen>
     <dimen name="much_overmode_function_nav_margin_left">10dp</dimen>

@@ -22,7 +22,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="fill_parent"
-        android:layout_height="170dp" />
+        android:layout_height="190dp" />
 
     <com.rgks.launcher3.overview.ui.UnderlinePageIndicator
 
