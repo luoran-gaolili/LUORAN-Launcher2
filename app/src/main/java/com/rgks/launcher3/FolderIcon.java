@@ -54,11 +54,8 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     private CheckLongPressHelper mLongPressHelper;
 
     // The number of icons to display in the
-    // Modify BUG_ID:NONE luoran 20150601(start)
-    //private static final int NUM_ITEMS_IN_PREVIEW = 3;
-    public static int NUM_ITEMS_IN_PREVIEW;
+    public static final int NUM_ITEMS_IN_PREVIEW = 4;
     private static final int NUM_COLUMN_IN_PREVIEW = 2;
-    // Modify BUG_ID:NONE luoran 20150601(end)
     private static final int CONSUMPTION_ANIMATION_DURATION = 100;
     private static final int DROP_IN_ANIMATION_DURATION = 400;
     private static final int INITIAL_ITEM_ANIMATION_DURATION = 350;
@@ -105,7 +102,7 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     private float mMaxPerspectiveShift;
     boolean mAnimating = false;
     private Rect mOldBounds = new Rect();
-    private static boolean is_rect_folder;
+
     private float mSlop;
 
     private PreviewItemDrawingParams mParams = new PreviewItemDrawingParams(0, 0, 0, 0);
@@ -126,14 +123,6 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     }
 
     private void init() {
-        //Add by luoran for change the folder icon  20150719 start
-        is_rect_folder = getResources().getBoolean(R.bool.is_rect_folder);
-        if (is_rect_folder) {
-            NUM_ITEMS_IN_PREVIEW = 4;
-        } else {
-            NUM_ITEMS_IN_PREVIEW = 3;
-        }
-        //Add by luoran for change the folder icon  20150719 end
         mLongPressHelper = new CheckLongPressHelper(this);
     }
 
@@ -226,18 +215,13 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
                 DeviceProfile grid = app.getInvariantDeviceProfile().portraitProfile;
                 sPreviewSize = grid.folderIconSizePx;
                 sPreviewPadding = res.getDimensionPixelSize(R.dimen.folder_preview_padding);
-                //Modify BUG_ID:none luoran 20150601(start)
+                //Modify BUG_ID:none luoran 20170620(start)
                 sAvailableIconSpace = res.getDimensionPixelSize(R.dimen.folder_available_icon_space);
-                //if(true){
-                //    sSharedOuterRingDrawable = res.getDrawable(R.drawable.portal_ring_outer_rect);
-                //    sSharedInnerRingDrawable = res.getDrawable(R.drawable.portal_ring_inner_rect);
-                //    sSharedFolderLeaveBehind = res.getDrawable(R.drawable.portal_ring_rest_rect);
-                //}else{
-                sSharedOuterRingDrawable = res.getDrawable(R.drawable.portal_ring_outer_holo);
-                sSharedInnerRingDrawable = res.getDrawable(R.drawable.portal_ring_inner_nolip_holo);
+                sSharedOuterRingDrawable = res.getDrawable(R.drawable.portal_ring_outer);
+                sSharedInnerRingDrawable = res.getDrawable(R.drawable.portal_ring_inner_nolip);
                 sSharedFolderLeaveBehind = res.getDrawable(R.drawable.portal_ring_rest);
                 //}
-                //Modify BUG_ID:none luoran 20150601(end)
+                //Modify BUG_ID:none luoran 20170620(end)
                 sStaticValuesDirty = false;
             }
         }
@@ -553,44 +537,26 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
     }
 
     private PreviewItemDrawingParams computePreviewItemDrawingParams(int index, PreviewItemDrawingParams params) {
-        //Modify BUG_ID:none luoran 20150601(start)
+        //Modify BUG_ID:none zhaopenglin 20150601(start)
+
         float transY;
         float transX;
         float totalScale;
         final int overlayAlpha;
-        if (!is_rect_folder) {
-            index = NUM_ITEMS_IN_PREVIEW - index - 1;
-            float r = (index * 1.0f) / (NUM_ITEMS_IN_PREVIEW - 1);
-            float scale = (1 - PERSPECTIVE_SCALE_FACTOR * (1 - r));
-
-            float offset = (1 - r) * mMaxPerspectiveShift;
-            float scaledSize = scale * mBaselineIconSize;
-            float scaleOffsetCorrection = (1 - scale) * mBaselineIconSize;
-
-            // We want to imagine our coordinates from the bottom left, growing up and to the
-            // right. This is natural for the x-axis, but for the y-axis, we have to invert things.
-            transY = mAvailableSpaceInPreview - (offset + scaledSize + scaleOffsetCorrection) + getPaddingTop() - 3;
-            transX = (mAvailableSpaceInPreview - scaledSize) / 2;
-            //transX = offset + scaleOffsetCorrection;
-            totalScale = mBaselineIconScale * scale;
-            overlayAlpha = (int) (80 * (1 - r));
-        } else {
-            float mAvailableSpaceInFolderIcon = FolderRingAnimator.sAvailableIconSpace;
-            float itemPadding = 10;
-            float scaledSize = (mAvailableSpaceInFolderIcon - itemPadding * NUM_COLUMN_IN_PREVIEW) / NUM_COLUMN_IN_PREVIEW;
-            float scale = scaledSize / mIntrinsicIconSize;
-            float leftMargin = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2 + 5;
+        float mAvailableSpaceInFolderIcon = FolderRingAnimator.sAvailableIconSpace;
+        float itemPadding = 8;
+        float scaledSize = (mAvailableSpaceInFolderIcon - itemPadding * NUM_COLUMN_IN_PREVIEW) / NUM_COLUMN_IN_PREVIEW;
+        float scale = scaledSize / mIntrinsicIconSize;
+        float leftMargin = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2;
             Resources res = getResources();
             int iconTopToFolderHeight = res.getDimensionPixelSize(R.dimen.folder_available_icon_height);
-            float topMarginY = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2 + iconTopToFolderHeight;
+        float topMarginY = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2 + iconTopToFolderHeight;
             int column = index % NUM_COLUMN_IN_PREVIEW;
             int row = index / NUM_COLUMN_IN_PREVIEW;
-            transX = leftMargin + scaledSize * column + itemPadding * column + 1;
+            transX = leftMargin + scaledSize * column + itemPadding * column + 5;
             transY = topMarginY + scaledSize * row + itemPadding * row - 5;
             totalScale = scale;
             overlayAlpha = 0;
-        }
-        //Modify BUG_ID:none luoran 20150601(end)
 
         if (params == null) {
             params = new PreviewItemDrawingParams(transX, transY, totalScale, overlayAlpha);
