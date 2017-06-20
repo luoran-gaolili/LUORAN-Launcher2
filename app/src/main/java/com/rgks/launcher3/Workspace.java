@@ -2060,8 +2060,13 @@ public class Workspace extends PagedView
             int defaultHomeScreenId = sharedPreferences.getInt("default_home_screen", 0);
             //  Log.d("GGGG", "indexOfChild(cl):" + indexOfChild(cl));
             if (indexOfChild(cl) == defaultHomeScreenId) {
-                ((CellLayout) (getChildAt(indexOfChild(cl) - 1))).setBackgroundResource(R.drawable.home_default);
-                editor.putInt("default_home_screen", indexOfChild(cl) - 1);
+                if ((indexOfChild(cl) - 1) != -1) {
+                    ((CellLayout) (getChildAt(indexOfChild(cl) - 1))).setBackgroundResource(R.drawable.home_default);
+                    editor.putInt("default_home_screen", indexOfChild(cl) - 1);
+                } else {
+                    ((CellLayout) (getChildAt(indexOfChild(cl) + 1))).setBackgroundResource(R.drawable.home_default);
+                    editor.putInt("default_home_screen", indexOfChild(cl) + 1);
+                }
                 editor.commit();
             }
             long screenId = getIdForScreen(cl);

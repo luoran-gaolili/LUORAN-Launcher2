@@ -7,10 +7,12 @@ import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.Toast;
 
 public class DeleteEmptyScreenHelper {
     private static final String TAG = "DeleteEmptyScreen";
     private static final int CLICK_DELAY = 200;
+    private static final int LIMIT_CHILD_COUNT = 2;
     private Context mContext;
     private Rect rect = new Rect(); //删除图标的矩形区域
     private Rect offRect = new Rect();  //扩大删除图标触摸区域
@@ -109,8 +111,12 @@ public class DeleteEmptyScreenHelper {
         }
         ViewParent parent = view.getParent();
         if (parent != null) {
-            mLauncher.getWorkspace().deleteNewEmptyScreen(view);
-            isClickDelete = true;
+            if (mLauncher.getWorkspace().getChildCount() != LIMIT_CHILD_COUNT) {
+                mLauncher.getWorkspace().deleteNewEmptyScreen(view);
+                isClickDelete = true;
+            } else {
+                ToastUtils.makeText(mLauncher, mLauncher.getResources().getString(R.string.rgk_only_one_screen), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

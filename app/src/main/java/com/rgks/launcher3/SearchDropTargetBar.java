@@ -66,10 +66,13 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
     private AnimatorSet mCurrentAnimation;
 
     private State mState = State.SEARCH_BAR;
-    @Thunk View mQSB;
-    @Thunk View mDropTargetBar;
+    @Thunk
+    View mQSB;
+    @Thunk
+    View mDropTargetBar;
     private boolean mDeferOnDragEnd = false;
-    @Thunk boolean mAccessibilityEnabled = false;
+    @Thunk
+    boolean mAccessibilityEnabled = false;
 
     // Drop targets
     private ButtonDropTarget mInfoDropTarget;
@@ -206,7 +209,9 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
      */
     @Override
     public void onDragStart(DragSource source, Object info, int dragAction) {
-        animateToState(State.DROP_TARGET, DEFAULT_DRAG_FADE_DURATION);
+        if (!(source instanceof MuchAppsCustomizePagedView)) {
+            animateToState(State.DROP_TARGET, DEFAULT_DRAG_FADE_DURATION);
+        }
     }
 
     /**

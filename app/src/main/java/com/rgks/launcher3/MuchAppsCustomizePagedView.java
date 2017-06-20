@@ -747,8 +747,13 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
         if (v instanceof BubbleTextView) {
             beginDraggingApplication(v);
         } else if (v instanceof RgkPagedViewWidget) {
-            if (!beginDraggingWidget(v)) {
-                return false;
+            if (mLauncher.getWorkspace().getCurrentPage() == mLauncher.getWorkspace().getChildCount() - 1) {
+                //nothing
+                ToastUtils.makeText(mLauncher, mLauncher.getResources().getString(R.string.not_support_add_widget), Toast.LENGTH_SHORT).show();
+            } else {
+                if (!beginDraggingWidget(v)) {
+                    return false;
+                }
             }
         }
 

@@ -199,16 +199,18 @@ public abstract class ButtonDropTarget extends TextView
         }
     }
 
-    @Override
+	@Override
     public final void onDragStart(DragSource source, Object info, int dragAction) {
-        mActive = supportsDrop(source, info);
-        mDrawable.setColorFilter(null);
-        if (mCurrentColorAnim != null) {
-            mCurrentColorAnim.cancel();
-            mCurrentColorAnim = null;
+        if (!(source instanceof MuchAppsCustomizePagedView)) {
+            mActive = supportsDrop(source, info);
+            mDrawable.setColorFilter(null);
+            if (mCurrentColorAnim != null) {
+                mCurrentColorAnim.cancel();
+                mCurrentColorAnim = null;
+            }
+            setTextColor(mOriginalTextColor);
+            ((ViewGroup) getParent()).setVisibility(mActive ? View.VISIBLE : View.GONE);
         }
-        setTextColor(mOriginalTextColor);
-        ((ViewGroup) getParent()).setVisibility(mActive ? View.VISIBLE : View.GONE);
     }
 
     @Override

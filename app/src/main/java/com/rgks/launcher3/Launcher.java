@@ -2685,7 +2685,6 @@ public class Launcher extends Activity
      * @param v The view representing the clicked shortcut.
      */
     public void onClick(View v) {
-        Log.d("sad", "onClick");
         // Make sure that rogue clicks don't get through while allapps is launching, or after the
         // view has detached (it's possible for this to happen if the view is removed mid touch).
         if (v.getWindowToken() == null) {
@@ -2740,7 +2739,7 @@ public class Launcher extends Activity
                             ((CellLayout) mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
                         }
                     }
-                    ToastUtils.makeText(Launcher.this, getResources().getString(R.string.default_home_set_success), Toast.LENGTH_SHORT).show();
+                    //ToastUtils.makeText(Launcher.this, getResources().getString(R.string.default_home_set_success), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -3663,18 +3662,23 @@ public class Launcher extends Activity
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < childCount; i++) {
-                    if (i == defalutHomeScreen) {
-                        (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
-                    } else {
-                        //页面添加界面不做处理
-                        if (!(mWorkspace.getChildAt(i) instanceof CellLayoutCreator)) {
-                            (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
-                        } else {
-                            //nothing
-                        }
-                    }
+                if (!(childCount == 2)) {
+                    for (int i = 0; i < childCount; i++) {
 
+                        if (i == defalutHomeScreen) {
+                            (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
+                        } else {
+                            //页面添加界面不做处理
+                            if (!(mWorkspace.getChildAt(i) instanceof CellLayoutCreator)) {
+                                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+                            } else {
+                                //nothing
+                            }
+                        }
+
+                    }
+                }else{
+                    (mWorkspace.getChildAt(0)).setBackgroundResource(R.drawable.home_default);
                 }
             }
         }, 300);

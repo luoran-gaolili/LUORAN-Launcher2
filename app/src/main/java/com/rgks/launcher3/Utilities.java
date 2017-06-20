@@ -335,7 +335,7 @@ public final class Utilities {
         }
     }
 
-    private static float mRoundedRate = 7f;  //圆角的角度
+    private static float mRoundedRate = 7f;
 
     private static Bitmap addBorderToImage(Bitmap src, int iconSize) {
 
@@ -376,11 +376,7 @@ public final class Utilities {
         return new Rect(0, 0, w, h);
     }
 
-    /**
-     * 得到原始图片中，底部中间的第一个完全不透明的颜色
-     *
-     * @return
-     */
+
     private static int getCenterTopColor(Bitmap src) {
         int w = src.getWidth();
         int h = src.getHeight();
@@ -397,11 +393,7 @@ public final class Utilities {
         return softColor(c);
     }
 
-    /**
-     * 得到原始图片中，顶部中间的第一个完全不透明的颜色
-     *
-     * @return
-     */
+
     private static int getCenterBottomColor(Bitmap src) {
         int w = src.getWidth();
         int h = src.getHeight();
@@ -419,12 +411,7 @@ public final class Utilities {
         return softColor(c);
     }
 
-    /**
-     * 将颜色变浅，变淡
-     *
-     * @param color
-     * @return
-     */
+
     private static int softColor(int color) {
         int r = (int) (Color.red(color) * 1.3);
         int b = (int) (Color.blue(color) * 1.3);

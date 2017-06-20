@@ -119,4 +119,6 @@
     <string name="wallpaper_library">壁纸库</string>
     <string name="add_widget">小部件</string>
     <string name="default_home_set_success">默认主屏已修改</string>
+    <string name="rgk_only_one_screen">不支持零屏删除</string>
+    <string name="not_support_add_widget">添加页不能拖动小部件</string>
 </resources>

@@ -251,11 +251,11 @@ public class DragController {
         mInputMethodManager.hideSoftInputFromWindow(mWindowToken, 0);
         //Log.d("GLL123", "source:" + source);
         //LUORAN(modify wodget drag)
-        if (!(source instanceof MuchAppsCustomizePagedView)) {
+       
             for (DragListener listener : mListeners) {
                 listener.onDragStart(source, dragInfo, dragAction);
             }
-        }
+
         final int registrationX = mMotionDownX - dragLayerX;
         final int registrationY = mMotionDownY - dragLayerY;
 
@@ -647,7 +647,6 @@ public class DragController {
                 handleMoveEvent(dragLayerX, dragLayerY);
                 break;
             case MotionEvent.ACTION_UP:
-                Log.d("GLL","ACTION_UP");
                 // Ensure that we've processed a move event at the current pointer location.
                 handleMoveEvent(dragLayerX, dragLayerY);
                 mHandler.removeCallbacks(mScrollRunnable);

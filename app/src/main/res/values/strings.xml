@@ -301,4 +301,6 @@
 
     <string name="add_app">Add App</string>
     <string name="add_app_count">Add App(%1$d)</string>
+    <string name="rgk_only_one_screen">Do not support zero-screen deletion</string>
+    <string name="not_support_add_widget">Add page can not drag widgets</string>
 </resources>
