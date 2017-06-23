@@ -403,7 +403,8 @@ public class WallpaperLayout extends LinearLayout implements InitPage {
                     }
                 }
             });
-            setWallpaperItemPaddingToZero((FrameLayout) view);
+            //添加此句 monkey测试会无响应
+            //setWallpaperItemPaddingToZero((FrameLayout) view);
 
             if (position == 0) {
                 WallpaperTileInfo info = mPageWallpapers.get(0);

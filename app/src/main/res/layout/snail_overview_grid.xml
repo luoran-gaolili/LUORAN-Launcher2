@@ -4,8 +4,5 @@
     android:layout_height="wrap_content"
     android:horizontalSpacing="10dp"
     android:numColumns="3"
-    android:paddingLeft="8dp"
-    android:paddingBottom="8dp"
-    android:paddingRight="8dp"
-    android:paddingTop="18dp"
+    android:padding="@dimen/much_overmode_effect_grid_padding"
     android:verticalSpacing="10dp"></GridView>

@@ -3417,7 +3417,7 @@ public class LauncherModel extends BroadcastReceiver
             }
             final ArrayList<Object> widgetsAndShortcuts =
                     getSortedWidgetsAndShortcuts(context);
-            //更新小部件数据 add by luoran
+            //update widget data add by luoran
             final Callbacks rgkCallbacks = getCallback();
             mHandler.post(new Runnable() {
                 @Override

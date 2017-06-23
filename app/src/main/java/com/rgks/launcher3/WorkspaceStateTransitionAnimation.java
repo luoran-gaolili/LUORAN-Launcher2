@@ -293,13 +293,13 @@ public class WorkspaceStateTransitionAnimation {
     private void animateWorkspace(final TransitionStates states, int toPage, final boolean animated,
                                   final int duration, final HashMap<View, Integer> layerViews,
                                   final boolean accessibilityEnabled) {
-
-       // Log.d("LUORAN123", "animateWorkspace");
+        //add by luoran for rgk launcher(start)
         if (states.stateIsOverview) {
             mWorkspace.addOrDeleteEmptyLayout(Workspace.State.OVERVIEW);
         } else if (states.stateIsNormal) {
             mWorkspace.addOrDeleteEmptyLayout(Workspace.State.NORMAL);
         }
+        //add by luoran for rgk launcher(end)
         // Reinitialize animation arrays for the current workspace state
         reinitializeAnimationArrays();
 
@@ -315,14 +315,17 @@ public class WorkspaceStateTransitionAnimation {
         float finalHotseatAndPageIndicatorAlpha = (states.stateIsNormal || states.stateIsSpringLoaded) ?
                 1f : 0f;
         float finalOverviewPanelAlpha = states.stateIsOverview ? 1f : 0f;
+        //modify by luoran for rgk launcher(start)
         float finalWorkspaceTranslationY = states.stateIsOverview || states.stateIsOverviewHidden ?
                 mLauncher.getResources().getDimension(R.dimen.workspace_translationY) : 0;
-
+        //modify by luoran for rgk launcher(end)
         final int childCount = mWorkspace.getChildCount();
         final int customPageCount = mWorkspace.numCustomPages();
 
         mNewScale = 1.0f;
+        //add by luoran for rgk launcher(start)
         iconNewScale = 1.0f;
+        //add by luoran for rgk launcher(end)
         if (states.oldStateIsOverview) {
             mWorkspace.disableFreeScroll();
         } else if (states.stateIsOverview) {
@@ -334,16 +337,17 @@ public class WorkspaceStateTransitionAnimation {
         if (!states.stateIsNormal) {
             if (states.stateIsSpringLoaded) {
                 mNewScale = mSpringLoadedShrinkFactor;
+                //add by luoran for rgk launcher(start)
                 iconNewScale = mSpringLoadedShrinkFactor;
+                //add by luoran for rgk launcher(end)
             } else if (states.stateIsOverview || states.stateIsOverviewHidden) {
                 mNewScale = 0.75f;
-                iconNewScale = 0.9f;
+                iconNewScale = 0.85f;
             }
         }
 
         if (toPage == SCROLL_TO_CURRENT_PAGE) {
             toPage = mWorkspace.getPageNearestToCenterOfScreen();
-            //Log.d("GGG", "snapPage:" + toPage);
         }
         mWorkspace.snapToPage(toPage, duration, mZoomInInterpolator);
 
@@ -372,16 +376,7 @@ public class WorkspaceStateTransitionAnimation {
                     cl.setShortcutAndWidgetAlpha(initialAlpha);
                 }
             }
-            if (states.stateIsNormal || states.workspaceToAllApps || states.allAppsToWorkspace) {
-                // Log.d("LUORAN123","if");
-                // hideWSPageView();
-                // mWorkspace.hideWsLongPageView();
-            } else {
-                //    Log.d("LUORAN123","else");
-                //   hideWSPageView();
-                //  hideWsLongPageView();
-                //mWorkspace.showWsLongPageView(mWorkspace.getCurrentPage());
-            }
+
             mOldAlphas[i] = initialAlpha;
             mNewAlphas[i] = finalAlpha;
             if (animated) {
@@ -396,7 +391,6 @@ public class WorkspaceStateTransitionAnimation {
         final ViewGroup overviewPanel = mLauncher.getOverviewPanel();
         final View hotseat = mLauncher.getHotseat();
         final View pageIndicator = mWorkspace.getPageIndicator();
-        //Log.d("GLL666", "animation:" + states.workspaceToOverview);
         if (animated) {
             LauncherViewPropertyAnimator scale = new LauncherViewPropertyAnimator(mWorkspace);
             scale.scaleX(mNewScale)
@@ -405,7 +399,6 @@ public class WorkspaceStateTransitionAnimation {
                     .setDuration(duration)
                     .setInterpolator(mZoomInInterpolator);
 
-           // Log.d("LUORAN1112", "states:" + states.toString());
             mStateAnimator.play(scale);
             for (int index = 0; index < childCount; index++) {
                 final int i = index;
@@ -413,7 +406,6 @@ public class WorkspaceStateTransitionAnimation {
                 //add by luoran for rgk launcher(start)
                 if (states.workspaceToOverview || states.oldStateIsOverview) {
                     int childCountOverview = cl.getChildCount();
-                    // Log.d("GLL666", "animation:" + states.workspaceToOverview);
                     for (int j = 0; j < childCountOverview; j++) {
                         if (cl.getChildAt(j) instanceof ClickShadowView) {
                             ClickShadowView shortcutAndWidgetContainer = (ClickShadowView) cl.getChildAt(j);

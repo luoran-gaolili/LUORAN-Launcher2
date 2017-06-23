@@ -3649,14 +3649,13 @@ public class Launcher extends Activity
             };
         }
         mWorkspace.setVisibility(View.VISIBLE);
-        //Log.d("GLLLR","2");
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.OVERVIEW,
                 WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE, animated,
                 postAnimRunnable);
         mState = State.WORKSPACE;
 
-        //延迟加载
+        //relay load
         final int defalutHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
         final int childCount = mWorkspace.getChildCount();
         new Handler().postDelayed(new Runnable() {
@@ -3664,18 +3663,18 @@ public class Launcher extends Activity
             public void run() {
                 if (!(childCount == 2)) {
                     for (int i = 0; i < childCount; i++) {
-
-                        if (i == defalutHomeScreen) {
-                            (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
-                        } else {
-                            //页面添加界面不做处理
-                            if (!(mWorkspace.getChildAt(i) instanceof CellLayoutCreator)) {
-                                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+                        if (mWorkspace.getChildAt(i) != null) {
+                            if (i == defalutHomeScreen) {
+                                (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_default);
                             } else {
-                                //nothing
+                                //页面添加界面不做处理
+                                if (!(mWorkspace.getChildAt(i) instanceof CellLayoutCreator)) {
+                                    (mWorkspace.getChildAt(i)).setBackgroundResource(R.drawable.home_current);
+                                } else {
+                                    //nothing
+                                }
                             }
                         }
-
                     }
                 }else{
                     (mWorkspace.getChildAt(0)).setBackgroundResource(R.drawable.home_default);
@@ -3768,12 +3767,12 @@ public class Launcher extends Activity
 
     public void enterSpringLoadedDragMode() {
         if (LOGD) Log.d(TAG, String.format("enterSpringLoadedDragMode [mState=%s", mState.name()));
-        //LUORAN
+        //modify by luoran for rgk launcher(start)
         if (mState == State.WORKSPACE || mState == State.APPS_SPRING_LOADED ||
                 mState == State.WIDGETS_SPRING_LOADED) {
             return;
         }
-        //Log.d("GLLLR","3");
+        //modify by luoran for rgk launcher(end)
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.SPRING_LOADED,
                 WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE, true /* animated */,

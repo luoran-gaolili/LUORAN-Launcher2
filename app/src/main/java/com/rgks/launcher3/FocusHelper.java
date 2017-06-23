@@ -14,10 +14,6 @@
 
 package com.rgks.launcher3;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import android.content.res.Configuration;
 import android.view.KeyEvent;
 import android.view.SoundEffectConstants;
@@ -25,6 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ScrollView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A keyboard listener we set on all the workspace icons.
@@ -493,15 +493,19 @@ public class FocusHelper {
                     if (workspace != null) {
                         int pageIndex = workspace.getCurrentPage();
                         CellLayout topLayout = (CellLayout) workspace.getChildAt(pageIndex);
-                        ShortcutAndWidgetContainer children = topLayout.getShortcutsAndWidgets();
-                        final View newIcon = getIconInDirection(layout, children, -1, 1);
-                        // Select the first bubble text view in the current page of the workspace
-                        if (newIcon != null) {
-                            newIcon.requestFocus();
-                            v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
-                        } else {
-                            workspace.requestFocus();
+                        //modify by luoran for monkey error 20170623(start)
+                        if (topLayout != null) {
+                            ShortcutAndWidgetContainer children = topLayout.getShortcutsAndWidgets();
+                            View newIcon = getIconInDirection(layout, children, -1, 1);
+                            // Select the first bubble text view in the current page of the workspace
+                            if (newIcon != null) {
+                                newIcon.requestFocus();
+                                v.playSoundEffect(SoundEffectConstants.NAVIGATION_UP);
+                            } else {
+                                workspace.requestFocus();
+                            }
                         }
+                        //modify by luoran for monkey error 20170623(end)
                     }
                 }
                 wasHandled = true;

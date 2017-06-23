@@ -51,7 +51,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Choreographer;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -61,9 +60,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rgks.launcher3.FolderIcon.FolderRingAnimator;
@@ -657,14 +653,9 @@ public class Workspace extends PagedView
         if (delegate != null && delegate.isInAccessibleDrag()) {
             newScreen.enableAccessibleDrag(true, CellLayout.WORKSPACE_ACCESSIBILITY_DRAG);
         }
-        if (screenId != EXTRA_EMPTY_SCREEN_ID) {
-            Log.d("GGG", "screenId:" + screenId);
-            showPageIndex(-1);
-        }
         return screenId;
     }
 
-    //LUORAN
     //LUORAN
     public long addNewScreen() {
         long newId = LauncherAppState.getLauncherProvider().generateNewScreenId();
@@ -1091,12 +1082,6 @@ public class Workspace extends PagedView
         return newId;
     }
 
-    public void hideWsLongPageView() {
-        mPageNum.clear();
-        qingcheng_widget_page_indicator.setVisibility(View.INVISIBLE);
-        // tmp.setVisibility(INVISIBLE);
-        mLauncher.mRefreshPageClick(false);
-    }
 
     public CellLayout getScreenWithId(long screenId) {
         CellLayout layout = mWorkspaceScreens.get(screenId);
@@ -2056,9 +2041,7 @@ public class Workspace extends PagedView
         if (view != null && view instanceof CellLayout) {
             CellLayout cl = (CellLayout) view;
             editor = sharedPreferences.edit();
-
             int defaultHomeScreenId = sharedPreferences.getInt("default_home_screen", 0);
-            //  Log.d("GGGG", "indexOfChild(cl):" + indexOfChild(cl));
             if (indexOfChild(cl) == defaultHomeScreenId) {
                 if ((indexOfChild(cl) - 1) != -1) {
                     ((CellLayout) (getChildAt(indexOfChild(cl) - 1))).setBackgroundResource(R.drawable.home_default);
@@ -2073,7 +2056,7 @@ public class Workspace extends PagedView
             mWorkspaceScreens.remove(screenId);
             mScreenOrder.remove(screenId);
             removeView(cl);
-            mDragView = null;//dragview 需要置空，否则长按后会残留
+            mDragView = null;//dragview
             mLauncher.getModel().updateWorkspaceScreenOrder(mLauncher, mScreenOrder);
         }
     }
@@ -2086,7 +2069,6 @@ public class Workspace extends PagedView
     //modify by luoran for rgk launcher(end)
     //modify by luoran for rgk launcher(start)
     public boolean isSmall() {
-        Log.d("LUORAN12345", "mState:" + mState);
         return mState == State.SPRING_LOADED || mState == State.OVERVIEW;
     }
     //modify by luoran for rgk launcher(end)
@@ -2100,7 +2082,6 @@ public class Workspace extends PagedView
             initWorkspaceChild();
             return;
         }
-        // Log.d("LUORAN666", "screenScrolled21");
         // TODO 修改 滑屏动画
         boolean isInOverscroll = true;
         // Apply transition effect and adjacent screen fade if enabled
@@ -2148,7 +2129,6 @@ public class Workspace extends PagedView
         for (int i = 0; i < getChildCount(); i++) {
             View v = getPageAt(i);
             if (v != null) {
-                // Log.d("LR","initWorkspaceChild");
                 initViewAnim(v);
             }
         }
@@ -2215,7 +2195,6 @@ public class Workspace extends PagedView
                     setChildAlpha(v, 1f);
                 }
             }
-
             mScrollTransformsSet = false;
         }
     }
@@ -2249,7 +2228,6 @@ public class Workspace extends PagedView
         public final String getName() {
             return mName;
         }
-
 
         public static void setFromString(Workspace workspace, String effect) {
             if (effect.equals(TransitionEffect.TRANSITION_EFFECT_NONE)) {
@@ -3251,217 +3229,6 @@ public class Workspace extends PagedView
 
         // Recycle temporary bitmaps
         tmpB.recycle();
-    }
-
-    public void showPageIndex(int childCount) {
-        int allPage = childCount;
-
-        if (childCount == -1) {
-            allPage = getChildCount();
-        }
-
-        // showQingchengWorkSpacePage(qingcheng_page_indicator, allPage, mCurrentPage, true);
-        showQingchengWorkSpacePage(qingcheng_widget_page_indicator, allPage, mCurrentPage, false);
-    }
-
-    LinearLayout qingcheng_widget_page_indicator;
-    ArrayList<View> mPageViewWsList = new ArrayList<View>();
-    ArrayList<View> mPageViewLongList = new ArrayList<View>();
-    ImageView inactive;
-    ImageView active;
-    ViewGroup tmp;
-    int mCellPageDistance = 20;
-
-    public void setQingchengWidgetPageIndicator(LinearLayout arg) {
-
-        qingcheng_widget_page_indicator = arg;
-    }
-
-    public void showQingchengWorkSpacePage(View v, int allpage, int cur, boolean workspace) {
-        if (/*cur >= allpage ||*/ cur < 0 || v == null || cur > allpage || allpage < 0) {
-            return;
-        }
-        if (workspace) {
-            mPageViewWsList.clear();
-        } else {
-            mPageViewLongList.clear();
-        }
-        TextView active;
-        tmp = (ViewGroup) v;
-        tmp.removeAllViews();
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-        lp.gravity = Gravity.CENTER;
-        lp.width = (int) mLauncher.getResources().getDimension(R.dimen.workspace_page_add_w);
-        lp.height = (int) mLauncher.getResources().getDimension(R.dimen.workspace_page_add_h);
-
-        if (allpage >= 9) {
-            mCellPageDistance = 16;
-        }
-
-        lp.leftMargin = mCellPageDistance;
-        for (int i = 0; i < allpage; i++) {
-            FrameLayout m =
-                    (FrameLayout) LayoutInflater.from(mLauncher).inflate(R.layout.work_click_page_view, null, false);
-            active = (TextView) m.findViewById(R.id.active);
-            inactive = (ImageView) m.findViewById(R.id.inactive);
-            String date = " " + (i + 1) + "   ";
-            active.setText(/*date.substring(0, 3)*/"" + (i + 1));
-            active.setTextSize(20);
-//			m.setBackgroundResource(R.color.workspace_page_view_default_color);
-            m.setBackgroundResource(R.drawable.workspace_page_view_default_color);
-
-            m.setId(i);
-            /**
-             * current page
-             */
-            if (i == cur) {
-//				m.setBackgroundResource(R.color.workspace_page_view_current_color);
-                m.setBackgroundResource(R.drawable.workspace_page_view_current_color);
-            }
-
-            /***
-             * set homepage
-             */
-
-            active.setVisibility(View.VISIBLE);
-            inactive.setVisibility(View.INVISIBLE);
-            int mTmpDefaultPage = mDefaultPage;
-            if (mLauncher.hasCustomContentToLeft()) {
-                mTmpDefaultPage = mTmpDefaultPage - 1;
-            }
-
-            if (i == mTmpDefaultPage && !workspace) {
-                inactive.setVisibility(View.VISIBLE);
-                inactive.setImageResource(R.drawable.workspace_add_home);
-                active.setVisibility(View.INVISIBLE);
-            }
-
-            m.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    // TODO Auto-generated method stub
-                    setPageNumberToScreen(tmp, arg0, arg0.getId());
-                }
-            });
-
-            m.setOnLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View arg0) {
-                    // TODO Auto-generated method stub
-                    setHomePage(tmp, arg0, arg0.getId());
-                    return true;
-                }
-            });
-
-            if (i == allpage - 1) {
-                lp.rightMargin = mCellPageDistance;
-            }
-
-            tmp.addView(m, i, lp);
-            if (workspace) {
-                mPageViewWsList.add(m);
-            } else {
-                mPageViewLongList.add(m);
-            }
-
-        }
-        tmp.setVisibility(View.INVISIBLE);
-
-    }
-
-    ArrayList<int[]> mPageNum = new ArrayList<int[]>();
-    int[] hw = new int[2];
-
-    public void showWsLongPageView(int index) {
-
-        if (mLauncher.hasCustomContentToLeft()) {
-            index = index - 1;
-        }
-
-        showWidgetViewPage(mPageViewLongList, index, true);
-        qingcheng_widget_page_indicator.setVisibility(View.VISIBLE);
-        // mLauncher.mRefreshPageClick(true);
-        mPageNum.clear();
-        for (int i = 0; i < mPageViewLongList.size(); i++) {
-            mPageNum.add(getXy(i, mPageViewLongList.get(i)));
-        }
-    }
-
-    public int[] getXy(int i, View child) {
-        int[] location = new int[2];
-        int[] location1 = new int[2];
-        child.getLocationInWindow(location);
-//		child.getLocationOnScreen(location1);
-        hw[0] = child.getWidth();
-        hw[1] = child.getHeight();
-//		Log.i(TAG," =getXy== 1: "+Arrays.toString(location)+" w: "+hw[0]+" h: "+hw[1]+" wW:"+getWidth()+" wH"+getHeight());
-
-        return location;
-    }
-
-    public void showWidgetViewPage(ArrayList<View> view, int index, boolean isLong) {
-
-
-        for (int i = 0; i < view.size(); i++) {
-            FrameLayout page = (FrameLayout) view.get(i);
-
-            TextView active = (TextView) page.findViewById(R.id.active);
-            inactive = (ImageView) page.findViewById(R.id.inactive);
-            String date = " " + (i + 1) + "   ";
-//			active.setText(date.substring(0, 3));
-            active.setText(/*date.substring(0, 3)*/"" + (i + 1));
-            active.setTextSize(20);
-//			page.setBackgroundResource(R.color.workspace_page_view_default_color);
-            page.setBackgroundResource(R.drawable.workspace_page_view_default_color);
-
-            if (i == index) {
-//				page.setBackgroundResource(R.color.workspace_page_view_current_color);
-                page.setBackgroundResource(R.drawable.workspace_page_view_current_color);
-            }
-            active.setVisibility(View.VISIBLE);
-            inactive.setVisibility(View.INVISIBLE);
-//			Log.i(TAG,"  ==showWidgetViewPage===== "+ mDefaultPage+" i:"+ i);
-            int mTmpDefaultPage = mDefaultPage;
-            if (mLauncher.hasCustomContentToLeft()) {
-                mTmpDefaultPage = mTmpDefaultPage - 1;
-            }
-            if (i == mTmpDefaultPage && isLong) {
-                inactive.setVisibility(View.VISIBLE);
-                inactive.setImageResource(R.drawable.workspace_add_home);
-                active.setVisibility(View.INVISIBLE);
-            }
-        }
-
-
-    }
-
-    public void setPageNumberToScreen(View parent, View child, int index) {
-        // showWidgetViewPage(mPageViewLongList,index, true);
-        if (mLauncher.hasCustomContentToLeft()) {
-            index = index + 1;
-        }
-        mLauncher.getWorkspace().snapToPage(index);
-    }
-
-    public void setHomePage(View parent, View child, int index) {
-//			moveToScreen(index, true);
-
-        mDefaultPage = index;
-        if (mLauncher.hasCustomContentToLeft()) {
-            mDefaultPage = index + 1;
-        }
-
-        index = getCurrentPage();
-        if (mLauncher.hasCustomContentToLeft()) {
-            index = index - 1;
-        }
-       /* showWidgetViewPage(mPageViewLongList, index ,true);
-        preferences = mLauncher.getSharedPreferences(QCPreference.PREFERENCE_NAME, Context.MODE_PRIVATE);
-        editor = preferences.edit();
-        editor.putInt(QCPreference.KEY_HOME_PAGE_NUMBER, mDefaultPage);
-        editor.commit();*/
     }
 
     public boolean transitionStateShouldAllowDrop() {

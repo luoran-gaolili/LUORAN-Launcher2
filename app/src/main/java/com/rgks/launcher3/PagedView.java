@@ -1879,7 +1879,14 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                     velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                     int velocityX = (int) velocityTracker.getXVelocity(activePointerId);
                     final int deltaX = (int) (x - mDownMotionX);
-                    final int pageWidth = getPageAt(mCurrentPage).getMeasuredWidth();
+                    //modify by luoran for monkey error 20170623(start)
+                    View rgkCurrentPageView = getPageAt(mCurrentPage);
+                    int rgkPagedWidth = 0;
+                    if (rgkCurrentPageView != null) {
+                        rgkPagedWidth = rgkCurrentPageView.getMeasuredWidth();
+                    }
+                    final int pageWidth = rgkPagedWidth;
+                    //modify by luoran for monkey error 20170623(end)
                     boolean isSignificantMove = Math.abs(deltaX) > pageWidth *
                             SIGNIFICANT_MOVE_THRESHOLD;
 

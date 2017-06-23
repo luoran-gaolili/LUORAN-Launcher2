@@ -538,7 +538,6 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
 
     private PreviewItemDrawingParams computePreviewItemDrawingParams(int index, PreviewItemDrawingParams params) {
         //Modify BUG_ID:none zhaopenglin 20150601(start)
-
         float transY;
         float transX;
         float totalScale;
@@ -548,16 +547,15 @@ public class FolderIcon extends FrameLayout implements FolderInfo.FolderListener
         float scaledSize = (mAvailableSpaceInFolderIcon - itemPadding * NUM_COLUMN_IN_PREVIEW) / NUM_COLUMN_IN_PREVIEW;
         float scale = scaledSize / mIntrinsicIconSize;
         float leftMargin = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2;
-            Resources res = getResources();
-            int iconTopToFolderHeight = res.getDimensionPixelSize(R.dimen.folder_available_icon_height);
+        Resources res = getResources();
+        int iconTopToFolderHeight = res.getDimensionPixelSize(R.dimen.folder_available_icon_height);
         float topMarginY = (mAvailableSpaceInPreview - mAvailableSpaceInFolderIcon) / 2 + iconTopToFolderHeight;
-            int column = index % NUM_COLUMN_IN_PREVIEW;
-            int row = index / NUM_COLUMN_IN_PREVIEW;
-            transX = leftMargin + scaledSize * column + itemPadding * column + 5;
-            transY = topMarginY + scaledSize * row + itemPadding * row - 5;
-            totalScale = scale;
-            overlayAlpha = 0;
-
+        int column = index % NUM_COLUMN_IN_PREVIEW;
+        int row = index / NUM_COLUMN_IN_PREVIEW;
+        transX = leftMargin + scaledSize * column + itemPadding * column + 5;
+        transY = topMarginY + scaledSize * row + itemPadding * row - 5;
+        totalScale = scale;
+        overlayAlpha = 0;
         if (params == null) {
             params = new PreviewItemDrawingParams(transX, transY, totalScale, overlayAlpha);
         } else {
