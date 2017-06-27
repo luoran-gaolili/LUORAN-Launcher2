@@ -15,4 +15,6 @@
 
 <resources>
     <dimen name="workspace_translationY">-110dp</dimen>
+    <dimen name="widget_short_left">20dp</dimen>
+    <dimen name="widget_short_top">20dp</dimen>
 </resources>

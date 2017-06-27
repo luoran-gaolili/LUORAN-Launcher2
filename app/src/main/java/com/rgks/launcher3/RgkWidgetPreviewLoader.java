@@ -15,14 +15,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -546,11 +544,16 @@ public class RgkWidgetPreviewLoader {
                     .getIntrinsicWidth();
             final int previewDrawableHeight = previewDrawable
                     .getIntrinsicHeight();
-            previewWidth = previewDrawableWidth * cellHSpan;
-            previewHeight = previewDrawableHeight * cellVSpan;
-
+            // Change for MyUI---20150818
+            //previewWidth = previewDrawableWidth * cellHSpan;
+            //previewHeight = previewDrawableHeight * cellVSpan;
+            previewWidth = (int) (previewDrawableWidth * 1.0f);
+            previewHeight = (int) (previewDrawableHeight * 1.0f);
             defaultPreview = Bitmap.createBitmap(previewWidth, previewHeight, Config.ARGB_8888);
-            final Canvas c = mCachedAppWidgetPreviewCanvas.get();
+
+
+            // Delete for MyUI---20150818
+            /*final Canvas c = mCachedAppWidgetPreviewCanvas.get();
             c.setBitmap(defaultPreview);
             Paint p = mDefaultAppWidgetPreviewPaint.get();
             if (p == null) {
@@ -562,7 +565,7 @@ public class RgkWidgetPreviewLoader {
             final Rect dest = mCachedAppWidgetPreviewDestRect.get();
             dest.set(0, 0, previewWidth, previewHeight);
             c.drawRect(dest, p);
-            c.setBitmap(null);
+            c.setBitmap(null);*/
 
             // Draw the icon in the top left corner
             int minOffset = (int) (mAppIconSize * WIDGET_PREVIEW_ICON_PADDING_PERCENTAGE);
@@ -573,8 +576,8 @@ public class RgkWidgetPreviewLoader {
             try {
                 Drawable icon = mManager.loadIcon(info, mIconCache);
                 if (icon != null) {
-                    int hoffset = (int) ((previewDrawableWidth - mAppIconSize * iconScale) / 2);
-                    int yoffset = (int) ((previewDrawableHeight - mAppIconSize * iconScale) / 2);
+                    int hoffset = (int) ((previewWidth - mAppIconSize * iconScale) / 2);
+                    int yoffset = (int) ((previewHeight - mAppIconSize * iconScale) / 2);
                     icon = mutateOnMainThread(icon);
                     renderDrawableToBitmap(icon, defaultPreview, hoffset,
                             yoffset, (int) (mAppIconSize * iconScale),
@@ -583,15 +586,22 @@ public class RgkWidgetPreviewLoader {
             } catch (Resources.NotFoundException e) {
             }
         }
-
         // Scale to fit width only - let the widget preview be clipped in the
         // vertical dimension
         float scale = 1f;
         if (preScaledWidthOut != null) {
             preScaledWidthOut[0] = previewWidth;
         }
-        if (previewWidth > maxPreviewWidth) {
-            scale = maxPreviewWidth / (float) previewWidth;
+
+        // Change for MyUI---20150812
+        if (previewWidth > previewHeight) {
+            if (previewWidth > maxPreviewWidth) {
+                scale = (float) (maxPreviewWidth / ((float) previewWidth * 1.2));
+            }
+        } else {
+            if (previewHeight > maxPreviewHeight) {
+                scale = (float) (maxPreviewHeight / ((float) previewHeight * 1.2));
+            }
         }
         if (scale != 1f) {
             previewWidth = (int) (scale * previewWidth);
@@ -605,8 +615,9 @@ public class RgkWidgetPreviewLoader {
 
         // Draw the scaled preview into the final bitmap
         int x = (preview.getWidth() - previewWidth) / 2;
+        int y = (preview.getHeight() - previewHeight) / 2;
         if (widgetPreviewExists) {
-            renderDrawableToBitmap(drawable, preview, x, 0, previewWidth,
+            renderDrawableToBitmap(drawable, preview, x, y, previewWidth,
                     previewHeight);
         } else {
             final Canvas c = mCachedAppWidgetPreviewCanvas.get();
@@ -614,7 +625,7 @@ public class RgkWidgetPreviewLoader {
             final Rect dest = mCachedAppWidgetPreviewDestRect.get();
             c.setBitmap(preview);
             src.set(0, 0, defaultPreview.getWidth(), defaultPreview.getHeight());
-            dest.set(x, 0, x + previewWidth, previewHeight);
+            dest.set(x, y, x + previewWidth, y + previewHeight);
 
             Paint p = mCachedAppWidgetPreviewPaint.get();
             if (p == null) {
@@ -625,8 +636,6 @@ public class RgkWidgetPreviewLoader {
             c.drawBitmap(defaultPreview, src, dest, p);
             c.setBitmap(null);
         }
-
-
         return mManager.getBadgeBitmap(info, preview);
     }
 
@@ -678,10 +687,10 @@ public class RgkWidgetPreviewLoader {
             mCachedShortcutPreviewPaint.set(p);
         }
         //修改此处可以去除小部件(快捷方式阴影)
-        c.drawBitmap(tempBitmap, 0, 0, p);
-        c.setBitmap(null);
+       // c.drawBitmap(tempBitmap, 0, 0, p);
+       // c.setBitmap(null);
         //需要适配分辨率
-        renderDrawableToBitmap(icon, preview, 80, 10, mAppIconSize, mAppIconSize);
+        renderDrawableToBitmap(icon, preview, mContext.getResources().getDimensionPixelSize(R.dimen.widget_short_left), mContext.getResources().getDimensionPixelSize(R.dimen.widget_short_top), mAppIconSize, mAppIconSize);
 
         return preview;
     }

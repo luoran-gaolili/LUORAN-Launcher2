@@ -48,6 +48,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.rgks.launcher3.compat.AppWidgetManagerCompat;
@@ -271,10 +272,10 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
     public void onFinishInflate() {
         super.onFinishInflate();
 
-        LauncherAppState app = LauncherAppState.getInstance();
+      /*  LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getInvariantDeviceProfile().portraitProfile;
         setPadding(grid.edgeMarginPx, 2 * grid.edgeMarginPx,
-                grid.edgeMarginPx, 2 * grid.edgeMarginPx);
+                grid.edgeMarginPx, 2 * grid.edgeMarginPx);*/
     }
 
     void setAllAppsPadding(Rect r) {
@@ -1249,21 +1250,29 @@ public class MuchAppsCustomizePagedView extends PagedViewWithDraggableItems impl
             int ix = i % mWidgetCountX;
             int iy = i / mWidgetCountX;
 
-            if (ix > 0) {
+           /* if (ix > 0) {
                 View border = widget.findViewById(R.id.left_border);
                 border.setVisibility(View.VISIBLE);
             }
             if (ix < mWidgetCountX - 1) {
                 View border = widget.findViewById(R.id.right_border);
                 border.setVisibility(View.VISIBLE);
-            }
+            }*/
 
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams(
                     GridLayout.spec(iy, GridLayout.START),
                     GridLayout.spec(ix, GridLayout.TOP));
-            lp.width = cellWidth;
+            // Change for MyUI---20150811
+          /*  lp.width = cellWidth-(2*getResources().getDimensionPixelSize(R.dimen.overview_panel_item_width_padding));
             lp.height = cellHeight;
-            lp.setGravity(Gravity.TOP | Gravity.START);
+            lp.setGravity(Gravity.TOP | Gravity.START);*/
+
+            lp.width = cellWidth - (2 * getResources().getDimensionPixelSize(R.dimen.overview_panel_item_width_padding));
+            lp.height = getResources().getDimensionPixelSize(R.dimen.overview_widget_height);
+            lp.leftMargin = getResources().getDimensionPixelSize(R.dimen.overview_panel_item_width_padding);
+            lp.rightMargin = getResources().getDimensionPixelSize(R.dimen.overview_panel_item_width_padding);
+            lp.topMargin = getResources().getDimensionPixelSize(R.dimen.overview_panel_item_width_padding_top);
+            lp.setGravity(Gravity.CENTER);
             layout.addView(widget, lp);
         }
 

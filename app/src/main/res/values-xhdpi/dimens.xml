@@ -15,4 +15,12 @@
 
 <resources>
     <dimen name="workspace_translationY">-100dp</dimen>
+    <dimen name="overview_panel_widget_image_height">120dp</dimen>
+    <dimen name="overview_panel_widget_image_padding">3dp</dimen>
+    <dimen name="overview_panel_item_width_padding">5dp</dimen>
+    <dimen name="overview_widget_height">165dp</dimen>
+    <dimen name="overview_panel_item_width_padding_top">10dp</dimen>
+    <dimen name="widget_short_left">32dp</dimen>
+    <dimen name="widget_short_top">32dp</dimen>
+
 </resources>
