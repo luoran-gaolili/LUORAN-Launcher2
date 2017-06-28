@@ -22,5 +22,5 @@
     <dimen name="overview_panel_item_width_padding_top">10dp</dimen>
     <dimen name="widget_short_left">32dp</dimen>
     <dimen name="widget_short_top">32dp</dimen>
-
+    <dimen name="rgk_indicator_height">2dp</dimen>
 </resources>

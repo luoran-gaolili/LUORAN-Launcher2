@@ -33,6 +33,7 @@ public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
     private PagerAdapter mAdapter;
     private ViewPager mPager;
     private UnderlinePageIndicator mIndicator = null;
+    private Xcircleindicator mXcircleindicator = null;
     private List<View> mListViews = new ArrayList<View>();
     private List<EffectItem> mEffectList = new ArrayList<EffectItem>();
     private List<EffectAdapter> mEffectAdapterList = new ArrayList<EffectAdapter>();
@@ -42,7 +43,7 @@ public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
     private LayoutAnimationController mAnimController;
     private boolean mIsFirstDone = true;
     public static boolean isClickItem = false;
-
+    private IndicatorView mIndicatorView = null;
     private static volatile UnderlinesNoFadeLayout underLinesSingleInstance = null;
 
     private UnderlinesNoFadeLayout(Context context) {
@@ -114,10 +115,36 @@ public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
         mPager = (ViewPager) view.findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
-
-        mIndicator = (UnderlinePageIndicator) view.findViewById(R.id.indicator);
+        mIndicatorView = (IndicatorView) findViewById(R.id.idv_banner);
+        mIndicatorView.setViewPager(mPager);
+       /* mXcircleindicator = (Xcircleindicator) findViewById(R.id.Xcircleindicator);
+       *//* mIndicator = (UnderlinePageIndicator) view.findViewById(R.id.indicator);
         mIndicator.setViewPager(mPager);
-        mIndicator.setFades(false);
+        mIndicator.setFades(false);*//*
+        //设置总共的页数
+        mXcircleindicator.initData(mListViews.size(), 0);
+        //设置当前的页面
+        mXcircleindicator.setCurrentPage(0);
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageSelected(int arg0) {
+                mXcircleindicator.setCurrentPage(arg0);
+
+            }
+
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });*/
     }
 
     private void initListViews() {

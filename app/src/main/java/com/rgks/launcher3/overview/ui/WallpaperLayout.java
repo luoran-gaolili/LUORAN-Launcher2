@@ -36,13 +36,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class WallpaperLayout extends LinearLayout implements InitPage {
 
     static final String TAG = "WallpaperLayout";
     private PagerAdapter mAdapter;
     private ViewPager mPager;
-    private UnderlinePageIndicator mIndicator = null;
+    //private UnderlinePageIndicator mIndicator = null;
+    private IndicatorView mIndicatorView = null;
     private List<View> mListViews = new ArrayList<View>();
     private static final int PORT_PAGE_ITEM = 3;
     private static final int COLUMN_NUM = 3;
@@ -183,10 +183,12 @@ public class WallpaperLayout extends LinearLayout implements InitPage {
         mPager = (ViewPager) view.findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
-
+        mIndicatorView = (IndicatorView) findViewById(R.id.idv_banner);
+        mIndicatorView.setViewPager(mPager);
+      /*  mIndicatorView = (IndicatorView) findViewById(R.id.idv_banner);
         mIndicator = (UnderlinePageIndicator) view.findViewById(R.id.indicator);
         mIndicator.setViewPager(mPager);
-        mIndicator.setFades(mWallpapers.size() <= PORT_PAGE_ITEM ? true : false);
+        mIndicator.setFades(mWallpapers.size() <= PORT_PAGE_ITEM ? true : false);*/
     }
 
     private void initListViews() {
