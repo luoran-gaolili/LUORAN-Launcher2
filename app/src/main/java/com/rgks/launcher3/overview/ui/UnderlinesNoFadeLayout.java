@@ -117,34 +117,6 @@ public class UnderlinesNoFadeLayout extends LinearLayout implements InitPage {
         mAdapter.notifyDataSetChanged();
         mIndicatorView = (IndicatorView) findViewById(R.id.idv_banner);
         mIndicatorView.setViewPager(mPager);
-       /* mXcircleindicator = (Xcircleindicator) findViewById(R.id.Xcircleindicator);
-       *//* mIndicator = (UnderlinePageIndicator) view.findViewById(R.id.indicator);
-        mIndicator.setViewPager(mPager);
-        mIndicator.setFades(false);*//*
-        //设置总共的页数
-        mXcircleindicator.initData(mListViews.size(), 0);
-        //设置当前的页面
-        mXcircleindicator.setCurrentPage(0);
-        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int arg0) {
-                mXcircleindicator.setCurrentPage(arg0);
-
-            }
-
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });*/
     }
 
     private void initListViews() {
