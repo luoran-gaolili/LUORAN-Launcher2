@@ -199,6 +199,7 @@ public class Workspace extends PagedView
     private float mOverviewModeShrinkFactor;
     private float mTempProgress;
     private int mMaxCount;
+    private boolean isFinishAnimationPreview = false;
     //add by luoran for rgk launcher(start)
     //preview animation
     @Override
@@ -208,6 +209,7 @@ public class Workspace extends PagedView
                 return;
             }
             mShowEffectAnim = true;
+            isFinishAnimationPreview = false;
             final int currentPage = getCurrentPage();
             if (currentPage == 0) {
                 snapToPage(1, EFFECT_TIME);
@@ -216,6 +218,7 @@ public class Workspace extends PagedView
                     @Override
                     public void run() {
                         snapToPage(0, EFFECT_TIME);
+                        isFinishAnimationPreview = true;
                     }
                 }, EFFECT_TIME);
             } else {
@@ -225,6 +228,7 @@ public class Workspace extends PagedView
                     @Override
                     public void run() {
                         snapToPage(currentPage, EFFECT_TIME);
+                        isFinishAnimationPreview = true;
                     }
                 }, EFFECT_TIME);
 
@@ -475,7 +479,6 @@ public class Workspace extends PagedView
 
         if (mAddNewPageOnDrag) {
             mDeferRemoveExtraEmptyScreen = false;
-            //拖动的时候添加空白界面
             addExtraEmptyScreenOnDrag();
         }
     }
@@ -1488,7 +1491,7 @@ public class Workspace extends PagedView
         }
         //add by luoran (动画结束后恢复)
         //initWorkspaceChild();
-        if (isSmall() && mShowEffectAnim) {
+        if (isSmall() && mShowEffectAnim && isFinishAnimationPreview) {
             mShowEffectAnim = false;
             initWorkspaceChild();
         }
@@ -3463,10 +3466,6 @@ public class Workspace extends PagedView
     }
 
     public void onDrop(final DragObject d) {
-        // mShowEffectAnim = false;
-        //  Log.d("LUORAN666", "onDropCompleted");
-        //  Log.d("LUORAN1234","onDrop");
-        //   mShowEffectAnim = false;
         mDragViewVisualCenter = d.getVisualCenter(mDragViewVisualCenter);
         CellLayout dropTargetLayout = mDropToLayout;
 
