@@ -24,6 +24,7 @@ import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.animation.AccelerateInterpolator;
@@ -209,9 +210,11 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
      */
     @Override
     public void onDragStart(DragSource source, Object info, int dragAction) {
-        if (!(source instanceof MuchAppsCustomizePagedView)) {
+        //modify by luoran for rgk launcher(start)
+        if ((!(source instanceof MuchAppsCustomizePagedView)) && (!(source instanceof Folder))) {
             animateToState(State.DROP_TARGET, DEFAULT_DRAG_FADE_DURATION);
         }
+        //modify by luoran for rgk launcher(end)
     }
 
     /**
@@ -224,6 +227,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
 
     @Override
     public void onDragEnd() {
+        //Log.d("TESR","onDragEnd");
         if (!mDeferOnDragEnd) {
             animateToState(State.SEARCH_BAR, DEFAULT_DRAG_FADE_DURATION);
         } else {

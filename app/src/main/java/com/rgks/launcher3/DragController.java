@@ -249,13 +249,9 @@ public class DragController {
                     mLauncher.getSystemService(Context.INPUT_METHOD_SERVICE);
         }
         mInputMethodManager.hideSoftInputFromWindow(mWindowToken, 0);
-        //Log.d("GLL123", "source:" + source);
-        //LUORAN(modify wodget drag)
-       
-            for (DragListener listener : mListeners) {
+        for (DragListener listener : mListeners) {
                 listener.onDragStart(source, dragInfo, dragAction);
-            }
-
+        }
         final int registrationX = mMotionDownX - dragLayerX;
         final int registrationY = mMotionDownY - dragLayerY;
 
@@ -407,11 +403,11 @@ public class DragController {
                 }
                 mDragObject.dragView = null;
             }
-
+            Log.d("GLL123", "mDragObject:" + mDragObject.dragSource);
             // Only end the drag if we are not deferred
             if (!isDeferred) {
                 for (DragListener listener : new ArrayList<>(mListeners)) {
-                    //Log.d("GLL123","endDrag");
+
                     listener.onDragEnd();
                 }
             }
@@ -425,16 +421,16 @@ public class DragController {
      */
     void onDeferredEndDrag(DragView dragView) {
         dragView.remove();
-        //LUORAN
-        if (!(mDragObject.dragSource instanceof MuchAppsCustomizePagedView)) {
+        //modify by luoran for rgk launcher(start)
+        if ((!(mDragObject.dragSource instanceof MuchAppsCustomizePagedView)) && (!(mDragObject.dragSource instanceof Folder))) {
             if (mDragObject.deferDragViewCleanupPostAnimation) {
                 // If we skipped calling onDragEnd() before, do it now
                 for (DragListener listener : new ArrayList<>(mListeners)) {
-                    //  Log.d("GLL123","onDeferredEndDrag");
                     listener.onDragEnd();
                 }
             }
         }
+        //modify by luoran for rgk launcher(start)
     }
 
     public void onDeferredEndFling(DropTarget.DragObject d) {

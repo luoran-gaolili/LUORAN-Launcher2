@@ -2685,6 +2685,7 @@ public class Launcher extends Activity
      * @param v The view representing the clicked shortcut.
      */
     public void onClick(View v) {
+        Log.d("GLLLLL", "v:" + v);
         // Make sure that rogue clicks don't get through while allapps is launching, or after the
         // view has detached (it's possible for this to happen if the view is removed mid touch).
         if (v.getWindowToken() == null) {
@@ -2747,9 +2748,10 @@ public class Launcher extends Activity
         }
 
         Object tag = v.getTag();
-       // Log.d("GGGG", "tag:" + tag);
+
         if (tag instanceof ShortcutInfo) {
             onClickAppShortcut(v);
+
         } else if (tag instanceof FolderInfo) {
             if (v instanceof FolderIcon) {
                 onClickFolderIcon(v);
@@ -2758,6 +2760,7 @@ public class Launcher extends Activity
             onClickAllAppsButton(v);
         } else if (tag instanceof AppInfo) {
             startAppShortcutOrInfoActivity(v);
+
         } else if (tag instanceof LauncherAppWidgetInfo) {
             if (v instanceof PendingAppWidgetHostView) {
                 onClickPendingWidget((PendingAppWidgetHostView) v);
@@ -3362,7 +3365,6 @@ public class Launcher extends Activity
      * @param folderInfo The FolderInfo describing the folder to open.
      */
     public void openFolder(FolderIcon folderIcon) {
-        Log.d("LR6661", "openFolder");
         Folder folder = folderIcon.getFolder();
         FolderInfo info = folder.mInfo;
 
@@ -3466,7 +3468,6 @@ public class Launcher extends Activity
                 if (mWorkspace.isInOverviewMode()) {
                     mWorkspace.startReordering(v);
                 } else {
-                    //Log.d("LUORAN11", "Workspace");
                     showOverviewMode(true);
                     mOverviewTabs.initPage(0);
                 }
@@ -3601,7 +3602,6 @@ public class Launcher extends Activity
 
             mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                     Workspace.State.NORMAL, snapToPage, animated, onCompleteRunnable);
-//Log.d("GLLLR","1");
             // Set focus to the AppsCustomize button
             if (mAllAppsButton != null) {
                 mAllAppsButton.requestFocus();
@@ -3655,7 +3655,7 @@ public class Launcher extends Activity
                 postAnimRunnable);
         mState = State.WORKSPACE;
 
-        //relay load
+        //delay load
         final int defalutHomeScreen = sharedPreferences.getInt("default_home_screen", 0);
         final int childCount = mWorkspace.getChildCount();
         new Handler().postDelayed(new Runnable() {
@@ -3782,14 +3782,13 @@ public class Launcher extends Activity
 
     public void exitSpringLoadedDragModeDelayed(final boolean successfulDrop, int delay,
                                                 final Runnable onCompleteRunnable) {
-        if (mState != State.APPS_SPRING_LOADED && mState != State.WIDGETS_SPRING_LOADED) return;
 
+        if (mState != State.APPS_SPRING_LOADED && mState != State.WIDGETS_SPRING_LOADED) return;
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (successfulDrop) {
                     // TODO(hyunyoungs): verify if this hack is still needed, if not, delete.
-                    //
                     // Before we show workspace, hide all apps again because
                     // exitSpringLoadedDragMode made it visible. This is a bit hacky; we should
                     // clean up our state transition functions

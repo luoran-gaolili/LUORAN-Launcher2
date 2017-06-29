@@ -201,7 +201,8 @@ public abstract class ButtonDropTarget extends TextView
 
 	@Override
     public final void onDragStart(DragSource source, Object info, int dragAction) {
-        if (!(source instanceof MuchAppsCustomizePagedView)) {
+        //modify by luoran for rgk launcher(start)
+        if ((!(source instanceof MuchAppsCustomizePagedView)) && (!(source instanceof Folder))) {
             mActive = supportsDrop(source, info);
             mDrawable.setColorFilter(null);
             if (mCurrentColorAnim != null) {
@@ -211,6 +212,7 @@ public abstract class ButtonDropTarget extends TextView
             setTextColor(mOriginalTextColor);
             ((ViewGroup) getParent()).setVisibility(mActive ? View.VISIBLE : View.GONE);
         }
+        //modify by luoran for rgk launcher(start)
     }
 
     @Override
