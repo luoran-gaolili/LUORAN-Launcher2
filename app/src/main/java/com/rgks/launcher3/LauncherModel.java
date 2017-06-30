@@ -2135,9 +2135,11 @@ public class LauncherModel extends BroadcastReceiver
                                         }
                                     } else if (itemType ==
                                             LauncherSettings.Favorites.ITEM_TYPE_APPLICATION) {
+                                        //modify by luoran for folder icon mohu(start)
                                         info = getAppShortcutInfo(intent, user, context, c,
                                                 cursorIconInfo.iconIndex, titleIndex,
-                                                allowMissingTarget, useLowResIcon);
+                                                allowMissingTarget, false);
+                                        //modify by luoran for folder icon mohu(end)
                                     } else {
                                         info = getShortcutInfo(c, context, titleIndex, cursorIconInfo);
 
