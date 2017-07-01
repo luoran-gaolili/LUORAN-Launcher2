@@ -31,7 +31,6 @@ public class LauncherActivityInfoCompatVL extends LauncherActivityInfoCompat {
         super();
         mLauncherActivityInfo = launcherActivityInfo;
     }
-
     public ComponentName getComponentName() {
         return mLauncherActivityInfo.getComponentName();
     }
