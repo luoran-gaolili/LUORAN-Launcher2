@@ -14,14 +14,14 @@
  * the License.
  */
 
-package com.kikikeji.weizhuo;
+package com.rgks.launcher3;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.KeyEvent;
 import android.view.View;
 
-import com.kikikeji.weizhuo.util.FocusLogic;
+import com.rgks.launcher3.util.FocusLogic;
 
 /**
  * Tests the {@link FocusLogic} class that handles key event based focus handling.

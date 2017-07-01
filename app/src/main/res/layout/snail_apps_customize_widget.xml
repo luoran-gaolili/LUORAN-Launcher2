@@ -12,13 +12,12 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.kikikeji.weizhuo.RgkPagedViewWidget xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res-auto"
-
+<com.rgks.launcher3.RgkPagedViewWidget xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rgk_widget_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
-
+    android:background="@color/white_second_transparency"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical">
@@ -30,12 +29,6 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <FrameLayout
-            android:id="@+id/left_border"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-
-            android:visibility="gone" />
         <!-- The preview of the widget or shortcut. -->
         <!--   <com.android.launcher3.widget.WidgetImageView
                android:id="@+id/widget_preview"
@@ -50,29 +43,18 @@
                android:scaleType="matrix" />-->
         <!-- The preview of the widget or shortcut. -->
         <!-- The preview of the widget or shortcut. -->
-        <com.kikikeji.weizhuo.PagedViewWidgetImageView
+        <com.rgks.launcher3.PagedViewWidgetImageView
             android:id="@+id/widget_preview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/overview_panel_widget_image_height"
 
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:alpha="0.2"
-            android:layout_gravity="center_vertical"
-            android:background="@color/white_second_transparency"
-            android:paddingEnd="@dimen/app_widget_preview_padding_right"
-            android:paddingLeft="10dp"
-            android:paddingRight="@dimen/app_widget_preview_padding_right"
-            android:paddingTop="@dimen/app_widget_preview_padding_top"
-            android:scaleType="center" />
+            android:gravity="center"
+            android:paddingBottom="0dp"
+            android:paddingLeft="@dimen/overview_panel_widget_image_padding"
+            android:paddingRight="@dimen/overview_panel_widget_image_padding"
+            android:paddingTop="8dp"
+            android:scaleType="matrix" />
 
-        <FrameLayout
-            android:id="@+id/right_border"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-
-            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
@@ -82,7 +64,10 @@
         android:layout_marginStart="2dp"
 
         android:orientation="horizontal"
-        android:padding="15dp">
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="15dp">
         <!-- The name of the widget. -->
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/widget_name"
@@ -119,4 +104,4 @@
     </LinearLayout>
 
 
-</com.kikikeji.weizhuo.RgkPagedViewWidget>
+</com.rgks.launcher3.RgkPagedViewWidget>

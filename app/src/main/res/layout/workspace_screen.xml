@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.kikikeji.weizhuo.CellLayout
+<com.rgks.launcher3.CellLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
 

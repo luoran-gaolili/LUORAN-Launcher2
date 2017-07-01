@@ -12,7 +12,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.kikikeji.weizhuo.AppsCustomizeTabHost xmlns:android="http://schemas.android.com/apk/res/android"
+<com.rgks.launcher3.AppsCustomizeTabHost xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -46,7 +46,7 @@
                     android:visibility="invisible" />
             </FrameLayout>
 
-            <com.kikikeji.weizhuo.AppsCustomizePagedView
+            <com.rgks.launcher3.AppsCustomizePagedView
                 android:id="@+id/apps_customize_pane_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -63,4 +63,4 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </LinearLayout>
-</com.kikikeji.weizhuo.AppsCustomizeTabHost>
+</com.rgks.launcher3.AppsCustomizeTabHost>

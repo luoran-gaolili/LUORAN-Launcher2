@@ -1,4 +1,4 @@
-package com.kikikeji.weizhuo.model;
+package com.rgks.launcher3.model;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -6,12 +6,12 @@ import android.database.Cursor;
 import android.graphics.Point;
 import android.test.ProviderTestCase2;
 
-import com.kikikeji.weizhuo.InvariantDeviceProfile;
-import com.kikikeji.weizhuo.LauncherAppState;
-import com.kikikeji.weizhuo.LauncherModel;
-import com.kikikeji.weizhuo.LauncherSettings;
-import com.kikikeji.weizhuo.config.ProviderConfig;
-import com.kikikeji.weizhuo.util.TestLauncherProvider;
+import com.rgks.launcher3.InvariantDeviceProfile;
+import com.rgks.launcher3.LauncherAppState;
+import com.rgks.launcher3.LauncherModel;
+import com.rgks.launcher3.LauncherSettings;
+import com.rgks.launcher3.config.ProviderConfig;
+import com.rgks.launcher3.util.TestLauncherProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

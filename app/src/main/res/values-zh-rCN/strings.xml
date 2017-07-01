@@ -17,8 +17,8 @@
  -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="649227358658669779">"微桌"</string>
-    <string name="application_name">"微桌"</string>
+    <string name="app_name" msgid="649227358658669779">"简易桌面"</string>
+    <string name="application_name">"简易桌面"</string>
     <string name="folder_name" msgid="7371454440695724752"></string>
     <string name="work_folder_name" msgid="3753320833950115786">"Work"</string>
     <string name="activity_not_found" msgid="8071924732094499514">"未安装该应用。"</string>
@@ -119,4 +119,6 @@
     <string name="wallpaper_library">壁纸库</string>
     <string name="add_widget">小部件</string>
     <string name="default_home_set_success">默认主屏已修改</string>
+    <string name="rgk_only_one_screen">不支持零屏删除</string>
+    <string name="not_support_add_widget">添加页不能拖动小部件</string>
 </resources>

@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.kikikeji.weizhuo.CheckableFrameLayout
+<com.rgks.launcher3.CheckableFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/wallpaperThumbnailWidth"
     android:layout_height="@dimen/wallpaperThumbnailHeight"
@@ -28,4 +28,4 @@
         android:layout_height="match_parent"
         android:focusableInTouchMode="true"
         android:scaleType="centerCrop" />
-</com.kikikeji.weizhuo.CheckableFrameLayout>
+</com.rgks.launcher3.CheckableFrameLayout>

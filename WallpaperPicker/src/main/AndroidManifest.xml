@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.kikikeji.weizhuo.wallpaper"
+        package="com.rgks.launcher3.wallpaper"
         android:versionCode="1"
         android:versionName="1.0"
         >

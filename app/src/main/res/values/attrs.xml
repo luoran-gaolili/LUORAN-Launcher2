@@ -174,4 +174,35 @@
         <!-- View background -->
         <attr name="android:background" />
     </declare-styleable>
+    <declare-styleable name="XCircleIndicator">
+        <!-- 被选中圆点的颜色 -->
+        <attr name="fillColor" format="color" />
+        <!-- 未选中圆点的颜色 -->
+        <attr name="strokeColor" format="color" />
+        <!-- 圆点的大小 -->
+        <attr name="radius" format="dimension" />
+        <!-- 圆点间间距的大小 -->
+        <attr name="circleInterval" format="dimension" />
+    </declare-styleable>
+    <!--IndicatorView相关-->
+    <!--普通指示器图片-->
+    <attr name="normalDrawable" format="reference" />
+    <!--选中指示器图片-->
+    <attr name="selectDrawable" format="reference" />
+    <!--指示器间隔-->
+    <attr name="indicatorInterval" format="dimension" />
+    <!--普通指示器颜色-->
+    <attr name="normalColor" format="color" />
+    <!--选中指示器颜色-->
+    <attr name="selectColor" format="color" />
+    <!--圆点弧度-->
+    <attr name="indicatorRadius" format="integer" />
+    <declare-styleable name="IndicatorView">
+        <attr name="normalDrawable" />
+        <attr name="selectDrawable" />
+        <attr name="indicatorInterval" />
+        <attr name="normalColor" />
+        <attr name="selectColor" />
+        <attr name="indicatorRadius" />
+    </declare-styleable>
 </resources>

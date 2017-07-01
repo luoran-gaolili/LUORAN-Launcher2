@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.kikikeji.gallery3d.glrenderer;
+package com.rgks.gallery3d.glrenderer;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.opengl.GLUtils;
 
-import com.kikikeji.gallery3d.common.Thunk;
-import com.kikikeji.gallery3d.common.Utils;
+import com.rgks.gallery3d.common.Thunk;
+import com.rgks.gallery3d.common.Utils;
 
 import java.util.HashMap;
 

@@ -30,7 +30,7 @@
     <string name="receive_first_load_broadcast_permission" translatable="false">com.kikikeji.weizhuo.permission.RECEIVE_FIRST_LOAD_BROADCAST</string>
 
     <!-- Application name -->
-    <string name="app_name">weizhuo</string>
+    <string name="app_name">UiLauncher</string>
     <string name="application_name">Launcher3</string>
     <!-- Default folder name -->
     <string name="folder_name"></string>
@@ -301,4 +301,6 @@
 
     <string name="add_app">Add App</string>
     <string name="add_app_count">Add App(%1$d)</string>
+    <string name="rgk_only_one_screen">Do not support zero-screen deletion</string>
+    <string name="not_support_add_widget">Add page can not drag widgets</string>
 </resources>

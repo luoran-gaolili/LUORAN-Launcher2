@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.kikikeji.weizhuo.Folder xmlns:android="http://schemas.android.com/apk/res/android"
+<com.rgks.launcher3.Folder xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,7 +28,7 @@
         android:background="@drawable/portal_container_holo"
         android:orientation="vertical">
 
-        <com.kikikeji.weizhuo.FolderEditText
+        <com.rgks.launcher3.FolderEditText
             android:id="@+id/folder_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,17 +44,17 @@
             android:textColorHint="@color/workspace_icon_text_color"
             android:textSize="24sp" />
 
-        <com.kikikeji.weizhuo.MuchFolderPageView
+        <com.rgks.launcher3.MuchFolderPageView
             android:id="@+id/folder_page"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></com.kikikeji.weizhuo.MuchFolderPageView>
+            android:layout_height="wrap_content"></com.rgks.launcher3.MuchFolderPageView>
 
-        <com.kikikeji.weizhuo.MuchFolderPagedViewIndicator
+        <com.rgks.launcher3.MuchFolderPagedViewIndicator
             android:id="@+id/folder_indicator"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top|center_horizontal"
-          ></com.kikikeji.weizhuo.MuchFolderPagedViewIndicator>
+          ></com.rgks.launcher3.MuchFolderPagedViewIndicator>
     </LinearLayout>
 
-</com.kikikeji.weizhuo.Folder>
+</com.rgks.launcher3.Folder>

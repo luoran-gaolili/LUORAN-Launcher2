@@ -17,20 +17,28 @@
     xmlns:rgks="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:idv="http://schemas.android.com/tools"
     android:orientation="vertical">
-
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="fill_parent"
-        android:layout_height="170dp" />
+        android:layout_height="195dp" />
 
-    <com.kikikeji.weizhuo.overview.ui.UnderlinePageIndicator
-
+    <com.rgks.launcher3.overview.ui.UnderlinePageIndicator
         android:id="@+id/indicator"
         android:layout_width="100dp"
         android:layout_height="1dp"
         rgks:fadeBackground="#FFFFFF"
-
+        android:visibility="gone"
         android:layout_gravity="center_horizontal"
         />
+    <com.rgks.launcher3.overview.ui.IndicatorView
+        android:id="@+id/idv_banner"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        idv:indicatorInterval="10dp"
+        idv:normalDrawable="@drawable/ic_pageindicator_current"
+        idv:selectDrawable="@drawable/ic_pageindicator_default" />
 </LinearLayout>

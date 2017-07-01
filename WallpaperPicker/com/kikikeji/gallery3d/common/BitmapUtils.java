@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.kikikeji.gallery3d.common;
+package com.rgks.gallery3d.common;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.util.Log;
 
-import com.kikikeji.gallery3d.exif.ExifInterface;
+import com.rgks.gallery3d.exif.ExifInterface;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
