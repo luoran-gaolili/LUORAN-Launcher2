@@ -511,7 +511,6 @@ public class Workspace extends PagedView
         mDragSourceInternal = null;
         mLauncher.onInteractionEnd();
     }
-
     /**
      * Initializes various states for this workspace.
      */
