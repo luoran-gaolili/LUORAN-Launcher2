@@ -500,7 +500,6 @@ public class Workspace extends PagedView
         if (!mDeferRemoveExtraEmptyScreen) {
             removeExtraEmptyScreen(true, mDragSourceInternal != null);
         }
-
         mIsDragOccuring = false;
         updateChildrenLayersEnabled(false);
         mLauncher.unlockScreenOrientation(false);
