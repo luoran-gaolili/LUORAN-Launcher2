@@ -96,7 +96,6 @@ public class AppInfo extends ItemInfo {
         if (quietModeEnabled) {
             isDisabled |= ShortcutInfo.FLAG_DISABLED_QUIET_USER;
         }
-
         iconCache.getTitleAndIcon(this, info, true /* useLowResIcon */);
         intent = makeLaunchIntent(context, info, user);
         this.user = user;
