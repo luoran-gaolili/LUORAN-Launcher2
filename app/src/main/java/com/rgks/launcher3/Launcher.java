@@ -3326,6 +3326,12 @@ public class Launcher extends Activity
         oa.start();
     }
 
+    private void setWPHVisibility(int visibility) {
+        mWorkspace.setVisibility(visibility);
+        mPageIndicators.setVisibility(visibility);
+        mHotseat.setVisibility(visibility);
+        mSearchDropTargetBar.setVisibility(visibility);
+    }
     private void shrinkAndFadeInFolderIcon(final FolderIcon fi, boolean animate) {
         if (fi == null) return;
         PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1.0f);
