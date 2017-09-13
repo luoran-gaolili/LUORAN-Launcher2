@@ -912,6 +912,9 @@ public class Workspace extends PagedView
     }
 
     private void convertFinalScreenToEmptyScreenIfNecessary() {
+        if (RgkConfig.SUPPORT_MUCH_STYLE) {
+            return;
+        }
         if (mLauncher.isWorkspaceLoading()) {
             // Invalid and dangerous operation if workspace is loading
             Launcher.addDumpLog(TAG, "    - workspace loading, skip", true);
@@ -964,9 +967,10 @@ public class Workspace extends PagedView
 
         convertFinalScreenToEmptyScreenIfNecessary();
         if (hasExtraEmptyScreen()) {
+            Log.d("GLL666879", "emptyIndex:");
             //modify by luoran for rgk launcher(start)
             int emptyIndex = mScreenOrder.indexOf(EXTRA_EMPTY_SCREEN_ID);
-            //Log.d("GLL666", "emptyIndex:" + emptyIndex);
+
             if (getNextPage() == emptyIndex) {
                 //允许保留空屏幕
                 if (RgkConfig.SUPPORT_MUCH_STYLE) {
