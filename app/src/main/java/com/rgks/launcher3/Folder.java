@@ -1375,6 +1375,7 @@ public class Folder extends LinearLayout
         for (int j = 0; j < mContent.getCountY(); j++) {
             for (int i = 0; i < mContent.getCountX(); i++) {
                 View v = mContent.getChildAt(i, j);
+                Log.d("uuu", "item:" + item);
                 if (v.getTag() == item) {
                     return v;
                 }

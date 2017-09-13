@@ -422,14 +422,14 @@ public class DragController {
     void onDeferredEndDrag(DragView dragView) {
         dragView.remove();
         //modify by luoran for rgk launcher(start)
-        if ((!(mDragObject.dragSource instanceof MuchAppsCustomizePagedView)) && (!(mDragObject.dragSource instanceof Folder))) {
-            if (mDragObject.deferDragViewCleanupPostAnimation) {
+
+        if (mDragObject.deferDragViewCleanupPostAnimation) {
                 // If we skipped calling onDragEnd() before, do it now
                 for (DragListener listener : new ArrayList<>(mListeners)) {
                     listener.onDragEnd();
                 }
             }
-        }
+
         //modify by luoran for rgk launcher(start)
     }
 

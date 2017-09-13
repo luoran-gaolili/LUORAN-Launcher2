@@ -869,8 +869,8 @@ public class Launcher extends Activity
                         ON_ACTIVITY_RESULT_ANIMATION_DELAY, false);
             }
         } else if (resultCode == RESULT_CANCELED) {
-          /*  mWorkspace.removeExtraEmptyScreenDelayed(true, exitSpringLoaded,
-                    ON_ACTIVITY_RESULT_ANIMATION_DELAY, false);*/
+            mWorkspace.removeExtraEmptyScreenDelayed(true, exitSpringLoaded,
+                    ON_ACTIVITY_RESULT_ANIMATION_DELAY, false);
         }
 
         mDragLayer.clearAnimatedView();
